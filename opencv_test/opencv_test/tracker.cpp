@@ -108,9 +108,7 @@ void cubeCoordinates(int id, cv::Vec3d& rvecs, cv::Vec3d& tvecs, float sideLengt
         tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH, 0);
         tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH, 1);
         tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH, 2);
-        //rvecs = rotateZAxis(rvecs, M_PI/2);
         rvecs = rotateXAxis(rvecs, -M_PI / 2);
-        //tvecs = moveAxis(tvecs, rvecs, SIDELENGTH / 2, 0);
         break;
     case 2:
         tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH, 0);
@@ -118,16 +116,12 @@ void cubeCoordinates(int id, cv::Vec3d& rvecs, cv::Vec3d& tvecs, float sideLengt
         tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH, 2);
         rvecs = rotateXAxis(rvecs, M_PI);
 
-        //rvecs = rotateZAxis(rvecs,-M_PI / 2);
-        //rvecs = rotateYAxis(rvecs, M_PI / 2);
-        //tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH / 2, 0);
 
         break;
     case 3:
         tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH, 0);
         tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH, 1);
         tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH, 2);
-        //rvecs = rotateXAxis(rvecs, M_PI);
         rvecs = rotateYAxis(rvecs, M_PI / 2);
         rvecs = rotateZAxis(rvecs, M_PI);
 
@@ -180,6 +174,12 @@ void averageCube(std::vector<cv::Vec3d>& rvecs, std::vector<cv::Vec3d>& tvecs, c
 
 void filterOutput(std::vector<cv::Vec3d> rvecs, std::vector<cv::Vec3d> tvecs)
 {
+}
+
+void debugPrinting(cv::Vec3d& rvec, cv::Vec3d& tvec)
+{
+    //std::cout << "Rotation: " << rvec << std::endl;
+    std::cout << "Translation: " << tvec << std::endl;
 }
 
 cv::aruco::DetectorParameters createDetectorParameters()

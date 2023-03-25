@@ -6,8 +6,6 @@
 
 void main()
 {
-    cv::KalmanFilter KF(2,1,0);
-    Mat state(6, 6, CV_32F);
     cv::VideoCapture inputVideo;
     inputVideo.open(0);
     cv::Mat cameraMatrix, distCoeffs,rotationMatrix,rotationMatrixTransposed,aux0,aux1;
@@ -52,6 +50,7 @@ void main()
                 }
             }
             averageCube(rvecs, tvecs, rvec, tvec);
+            debugPrinting(rvec, tvec);
             cv::drawFrameAxes(imageCopy, cameraMatrix, distCoeffs, rvec, tvec, markerSideLength);
 
         }

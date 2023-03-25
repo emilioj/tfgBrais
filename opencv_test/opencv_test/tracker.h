@@ -26,6 +26,7 @@ cv::Vec3d moveAxis(cv::Vec3d& tvec, cv::Vec3d rvec, double distance, int axis);
 void cubeCoordinates(int id, cv::Vec3d& rvecs, cv::Vec3d& tvecs, float sideLength, float gapLength);
 void averageCube(std::vector<cv::Vec3d>& rvecs, std::vector<cv::Vec3d>& tvecs, cv::Vec3d& outputRvec, cv::Vec3d& outputTvec);
 void filterOutput(std::vector<cv::Vec3d> rvecs, std::vector<cv::Vec3d>tvecs);
+void debugPrinting(cv::Vec3d& rvec, cv::Vec3d& tvec);
 cv::aruco::DetectorParameters createDetectorParameters();
 
 
