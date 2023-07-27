@@ -26,10 +26,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\..\lib\opencv_contrib\modules\aruco\samples\aruco_samples_utility.hpp">
-      <Filter>Archivos de origen</Filter>
-    </ClInclude>
     <ClInclude Include="tracker.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="aruco_samples_utility.hpp">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>

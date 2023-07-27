@@ -5,8 +5,6 @@
 #include <opencv2/aruco.hpp>
 #include <opencv2/aruco/charuco.hpp>
 #include <iomanip>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/fwd.hpp>
 #include <math.h>   
 #include <opencv2/video/tracking.hpp>
 

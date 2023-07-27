@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\lib\install\opencv\include;C:\lib\opencv_contrib\modules\aruco\samples;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\lib\install\opencv\x64\vc17\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Brais\3xposure-render-thirdparty\win64-thirdparty\opencv\build\install\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Brais\3xposure-render-thirdparty\win64-thirdparty\opencv\build\install\x64\vc17\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -137,7 +137,7 @@
     <ClCompile Include="tracker.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\..\lib\opencv_contrib\modules\aruco\samples\aruco_samples_utility.hpp" />
+    <ClInclude Include="aruco_samples_utility.hpp" />
     <ClInclude Include="tracker.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
