@@ -1,16 +1,19 @@
 #include "tracker.h"
+#include <opencv2/calib3d.hpp>
 
-std::vector<cv::Ptr<cv::aruco::GridBoard>> createBoards(float markerSideLength, float markerGapLength)
+
+std::vector<cv::aruco::GridBoard> createBoards(float markerSideLength, float markerGapLength, cv::aruco::Dictionary& dictionary)
 {
     cv::Mat boardImage;
-    cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
-    std::vector<cv::Ptr<cv::aruco::GridBoard>> boards;
+    std::vector<cv::aruco::GridBoard> boards;
     for (int i = 0; i < 6; i++)
     {
-        cv::Ptr<cv::aruco::GridBoard> board = cv::aruco::GridBoard::create(2, 2, markerSideLength, markerGapLength, dictionary, i * 4);
-        board->draw(cv::Size(500, 500), boardImage, 10, 1);
+        int firstId = i*4;
+        std::vector<int> ids = { firstId, firstId + 1, firstId + 2, firstId + 3 };
+        cv::aruco::GridBoard board(cv::Size(2, 2), markerSideLength, markerGapLength, dictionary, InputArray(ids));
+        board.generateImage(cv::Size(500, 500), boardImage, 10, 1);
         boards.push_back(board);
-        string name = "boards/board" + to_string(i) + ".png";
+        string name = "C:/tfg/tfg/data/markers/runtime/board" + to_string(i) + ".png";
         cv::imwrite(name, boardImage);
     }
     return boards;
