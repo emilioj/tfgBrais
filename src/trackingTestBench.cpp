@@ -1,66 +1,52 @@
-#include "tracker.h"
-#include <string>
-#include <opencv2/calib3d.hpp>
+#include "tracker.h" // no opencv needed
+#include <iostream>
+#include <thread>
+#include <mutex>
+#include <chrono>
+#include <atomic>
 
+static std::mutex poseMutex;
+static TrackerPose globalPose;
+static std::atomic<bool> running(true);
 
+// We decide on some marker dimensions:
+static double markerSideLength = 0.015;
+static double markerGapLength = 0.007;
+std::string calibrationFile = "./data/camera_calibration/camera_calibration.txt";
+std::string boardDir = "./data/markers/runtime";
 
-
-void main()
-{
-    cv::VideoCapture inputVideo;
-    inputVideo.open(0);
-    cv::Mat cameraMatrix, distCoeffs,rotationMatrix,rotationMatrixTransposed,aux0,aux1;
-    float pi2 = M_PI / 2;
-    std::string cameraCalibrationFilePath = "D:/brais/tfg/win64-msvc2022/camera_calibration.txt";
-    cv::Vec3d rvec, tvec;
-    std::vector<cv::Vec3d> rvecs, tvecs;
-    cv::Vec3d averageR, averageT;
-    readCameraParameters(cameraCalibrationFilePath, cameraMatrix, distCoeffs);
-    std::vector<cv::aruco::GridBoard> boards;
-    cv::aruco::Dictionary dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
-    aruco::DetectorParameters detectorParams;
-    aruco::ArucoDetector detector(dictionary, detectorParams);
-    float markerSideLength= 0.015;
-    float markerGapLength=0.007;
-    boards = createBoards(markerSideLength, markerGapLength,dictionary);
-    while (inputVideo.grab()) {
-        cv::Mat image, imageCopy;
-        inputVideo.retrieve(image);
-        image.copyTo(imageCopy);
-        std::vector<int> ids;
-        std::vector<std::vector<cv::Point2f>> markerCorners,rejectedCorners;
-       detector.detectMarkers(image, markerCorners, ids, rejectedCorners);
-       if (ids.size() > 0) {
-            cv::aruco::drawDetectedMarkers(imageCopy, markerCorners, ids);
-            for (int i = 0; i < boards.size(); i++)
-            {
-                detector.refineDetectedMarkers(imageCopy, boards[i], markerCorners, ids, rejectedCorners);
-            }
-            for (int i = 0; i < 6; i++)
-            {
-                cv::Mat objPoints, imgPoints;
-                boards[i].matchImagePoints(markerCorners, ids, objPoints, imgPoints);
-                if (objPoints.empty() || imgPoints.empty()) {
-                    continue;
-                }
-                bool valid = cv::solvePnP(objPoints, imgPoints, cameraMatrix, distCoeffs, rvec, tvec);
-                if (valid)
-                {
-                    cubeCoordinates(i, rvec, tvec, markerSideLength, markerGapLength);
-                    rvecs.push_back(rvec);
-                    tvecs.push_back(tvec);
-                }
-            }
-            averageCube(rvecs, tvecs, rvec, tvec);
-            cv::drawFrameAxes(imageCopy, cameraMatrix, distCoeffs, rvec, tvec, markerSideLength);
-    
+void captureThread(bool showVisualization, double mSideLength, double mGapLength, std::string calibrationFile, std::string boardDir) {
+    while (running) {
+        TrackerPose newPose = getCubePose(showVisualization, mSideLength, mGapLength, calibrationFile, boardDir);
+        {
+            std::lock_guard<std::mutex> lock(poseMutex);
+            globalPose = newPose;
         }
-        rvecs.clear();
-        tvecs.clear();
-        cv::imshow("out", imageCopy);
-        char key = (char)cv::waitKey(1);
-       if (key == 27)
-            break;
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
 
+int main() {
+    // Start the capture thread with visualization and chosen marker params
+    std::thread t(captureThread, true, markerSideLength, markerGapLength, calibrationFile, boardDir);
+
+    // Main loop: print current pose every half-second
+    while (true) {
+        {
+            std::lock_guard<std::mutex> lock(poseMutex);
+            std::cout << "Current Pose: R["
+                << globalPose.rotation[0] << ", "
+                << globalPose.rotation[1] << ", "
+                << globalPose.rotation[2] << "] T["
+                << globalPose.translation[0] << ", "
+                << globalPose.translation[1] << ", "
+                << globalPose.translation[2] << "]\n";
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
+
+    // Stop the thread
+    running = false;
+    t.join();
+    return 0;
+}
