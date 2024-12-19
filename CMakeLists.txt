@@ -24,3 +24,11 @@ install(TARGETS opencv_test
 
 file(GLOB HEADERS src/*.h src/*.hpp)
 install(FILES ${HEADERS} DESTINATION include/opencv_test)
+
+# Build the test executable (which uses the main() from trackingTestBench.cpp)
+add_executable(trackingTestBench src/trackingTestBench.cpp)
+target_link_libraries(trackingTestBench opencv_test ${OpenCV_LIBS})
+
+# Optionally install the test executable if desired
+install(TARGETS trackingTestBench
+        RUNTIME DESTINATION bin)

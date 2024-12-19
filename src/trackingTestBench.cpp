@@ -8,18 +8,18 @@
 void main()
 {
     cv::VideoCapture inputVideo;
-    inputVideo.open(0); // or CAP_DSHOW or CAP_ANY
+    inputVideo.open(0);
     cv::Mat cameraMatrix, distCoeffs,rotationMatrix,rotationMatrixTransposed,aux0,aux1;
     float pi2 = M_PI / 2;
-    std::string cameraCalibrationFilePath = "C:/tfg/tfg/data/camera_calibration/camera_calib.txt";
+    std::string cameraCalibrationFilePath = "D:/brais/tfg/win64-msvc2022/camera_calibration.txt";
     cv::Vec3d rvec, tvec;
     std::vector<cv::Vec3d> rvecs, tvecs;
     cv::Vec3d averageR, averageT;
     readCameraParameters(cameraCalibrationFilePath, cameraMatrix, distCoeffs);
     std::vector<cv::aruco::GridBoard> boards;
     cv::aruco::Dictionary dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
-    aruco::DetectorParameters detectorParams();
-    aruco::ArucoDetector detector(dictionary);
+    aruco::DetectorParameters detectorParams;
+    aruco::ArucoDetector detector(dictionary, detectorParams);
     float markerSideLength= 0.0215;
     float markerGapLength=0.0085;
     boards = createBoards(markerSideLength, markerGapLength,dictionary);
