@@ -20,11 +20,9 @@ void main()
     cv::aruco::Dictionary dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
     aruco::DetectorParameters detectorParams;
     aruco::ArucoDetector detector(dictionary, detectorParams);
-    float markerSideLength= 0.0215;
-    float markerGapLength=0.0085;
+    float markerSideLength= 0.015;
+    float markerGapLength=0.007;
     boards = createBoards(markerSideLength, markerGapLength,dictionary);
-    inputVideo.set(CAP_PROP_FRAME_HEIGHT, 720);
-    inputVideo.set(CAP_PROP_FRAME_WIDTH, 1280);
     while (inputVideo.grab()) {
         cv::Mat image, imageCopy;
         inputVideo.retrieve(image);
