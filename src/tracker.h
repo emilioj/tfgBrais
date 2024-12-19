@@ -14,8 +14,7 @@
 # define SIDELENGTH 0.025
 using namespace std;
 using namespace cv;
-std::vector<cv::Ptr<cv::aruco::GridBoard>> createBoards(float markerSideLength, float markerGapLength);
-//void createCalibrationBoard(int squaresX, int squaresY, float squareLength, float markerLength,const Ptr<cv::aruco::Dictionary>dictionary);
+std::vector<cv::aruco::GridBoard> createBoards(float markerSideLength, float markerGapLength, cv::aruco::Dictionary& dictionary);
 bool readCameraParameters(std::string filename, cv::Mat& camMatrix, cv::Mat& distCoeffs);
 cv::Vec3d rotateXAxis(cv::Vec3d rotation, double angleRad);
 cv::Vec3d rotateYAxis(cv::Vec3d rotation, double angleRad);
