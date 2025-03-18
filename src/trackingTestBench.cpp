@@ -1,52 +1,72 @@
-#include "tracker.h" // no opencv needed
-#include <iostream>
+#include "tracker.h"
 #include <thread>
 #include <mutex>
-#include <chrono>
 #include <atomic>
+#include <iostream>
+#include <chrono>
 
+static PoseMatrix4x4 globalPose;
 static std::mutex poseMutex;
-static TrackerPose globalPose;
 static std::atomic<bool> running(true);
+PoseMatrix4x4 makeIdentity()
+{
+    PoseMatrix4x4 pose;
+    for (int i = 0; i < 16; ++i) {
+        pose.m[i] = ((i % 5) == 0) ? 1.0 : 0.0;
+        // i%5 == 0 picks out diagonal elements (0,5,10,15)
+    }
+    return pose;
+}
 
-// We decide on some marker dimensions:
-static double markerSideLength = 0.015;
-static double markerGapLength = 0.007;
-std::string calibrationFile = "./data/camera_calibration/camera_calibration.txt";
-std::string boardDir = "./data/markers/runtime";
+void captureThreadFunc(bool showViz,
+    double markerSideLen,
+    double markerGapLen,
+    const std::string& calibFile,
+    const std::string& boardsDir)
+{
+    // (In a real scenario, you might update this from IMU or other tracking)
+    PoseMatrix4x4 headsetPose = makeIdentity();
 
-void captureThread(bool showVisualization, double mSideLength, double mGapLength, std::string calibrationFile, std::string boardDir) {
-    while (running) {
-        TrackerPose newPose = getCubePose(showVisualization, mSideLength, mGapLength, calibrationFile, boardDir);
+    while (running)
+    {
+        PoseMatrix4x4 newPose = getCubePoseMatrix(
+            showViz,
+            markerSideLen,
+            markerGapLen,
+            calibFile,
+            boardsDir,
+            headsetPose
+        );
+
         {
             std::lock_guard<std::mutex> lock(poseMutex);
             globalPose = newPose;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }
 
-int main() {
-    // Start the capture thread with visualization and chosen marker params
-    std::thread t(captureThread, true, markerSideLength, markerGapLength, calibrationFile, boardDir);
-
-    // Main loop: print current pose every half-second
-    while (true) {
+int main()
+{
+    std::thread captureThread(captureThreadFunc, true, 0.015, 0.007, "./data/camera_calibration/camera_calibration.txt", "./data/markers/runtime");
+    while (true)
+    {
         {
             std::lock_guard<std::mutex> lock(poseMutex);
-            std::cout << "Current Pose: R["
-                << globalPose.rotation[0] << ", "
-                << globalPose.rotation[1] << ", "
-                << globalPose.rotation[2] << "] T["
-                << globalPose.translation[0] << ", "
-                << globalPose.translation[1] << ", "
-                << globalPose.translation[2] << "]\n";
+            std::cout << "Current 4x4 Pose:\n";
+            for (int row = 0; row < 4; ++row) {
+                std::cout << globalPose.m[row * 4 + 0] << " "
+                    << globalPose.m[row * 4 + 1] << " "
+                    << globalPose.m[row * 4 + 2] << " "
+                    << globalPose.m[row * 4 + 3] << "\n";
+            }
+            std::cout << std::endl;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    }
 
-    // Stop the thread
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
     running = false;
-    t.join();
+    captureThread.join();
     return 0;
 }
