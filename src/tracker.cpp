@@ -14,6 +14,46 @@ static cv::Mat cameraMatrix, distCoeffs;
 static std::vector<cv::aruco::GridBoard> boards;
 static cv::aruco::ArucoDetector detector;
 
+namespace {
+
+	// PoseMatrix4x4 -> cv::Mat (4x4)
+	cv::Mat poseMatrixToCvMat(const PoseMatrix4x4& pose)
+	{
+		cv::Mat mat(4, 4, CV_64F);
+		for (int i = 0; i < 16; i++) {
+			mat.at<double>(i / 4, i % 4) = pose.m[i];
+		}
+		return mat;
+	}
+
+	// cv::Mat (4x4) -> PoseMatrix4x4
+	PoseMatrix4x4 cvMatToPoseMatrix(const cv::Mat& mat)
+	{
+		PoseMatrix4x4 out;
+		for (int row = 0; row < 4; row++) {
+			for (int col = 0; col < 4; col++) {
+				out.m[row * 4 + col] = mat.at<double>(row, col);
+			}
+		}
+		return out;
+	}
+
+	// cv::Mat from rotation & translation
+	cv::Mat buildTransformation(const cv::Vec3d& rvec, const cv::Vec3d& tvec)
+	{
+		cv::Mat rot3x3;
+		cv::Rodrigues(rvec, rot3x3);
+
+		cv::Mat out = cv::Mat::eye(4, 4, CV_64F);
+		rot3x3.copyTo(out(cv::Rect(0, 0, 3, 3)));
+		out.at<double>(0, 3) = tvec[0];
+		out.at<double>(1, 3) = tvec[1];
+		out.at<double>(2, 3) = tvec[2];
+		return out;
+	}
+
+}
+
 bool readCameraParameters(std::string filename, cv::Mat& camMatrix, cv::Mat& distCoeffs)
 {
 	cv::FileStorage fs(filename, cv::FileStorage::READ);
@@ -272,4 +312,103 @@ TrackerPose getCubePose(bool showVisualization,
 	}
 
 	return poseResult;
+}
+
+PoseMatrix4x4 getCubePoseMatrix(
+	bool showVisualization,
+	double markerSideLength,
+	double markerGapLength,
+	const std::string& calibrationFilePath,
+	const std::string& boardDirPath,
+	const PoseMatrix4x4& headsetPose)
+{
+	if (!initialized)
+	{
+		if (!inputVideo.open(0)) {
+			std::cerr << "Could not open camera index 0\n";
+			return headsetPose;
+		}
+		if (!readCameraParameters(calibrationFilePath, cameraMatrix, distCoeffs)) {
+			std::cerr << "Failed to read camera params from: " << calibrationFilePath << "\n";
+			return headsetPose;
+		}
+		cv::aruco::Dictionary dict = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
+		boards = createBoards(static_cast<float>(markerSideLength),
+			static_cast<float>(markerGapLength),
+			dict,
+			boardDirPath);
+		cv::aruco::DetectorParameters params;
+		detector = cv::aruco::ArucoDetector(dict, params);
+
+		initialized = true;
+	}
+
+	cv::Mat headsetMat = poseMatrixToCvMat(headsetPose);
+
+	cv::Mat frame;
+	if (!inputVideo.grab()) {
+		std::cerr << "Failed to grab frame.\n";
+		return headsetPose;
+	}
+	inputVideo.retrieve(frame);
+
+	std::vector<int> ids;
+	std::vector<std::vector<cv::Point2f>> corners, rejected;
+	detector.detectMarkers(frame, corners, ids, rejected);
+
+	for (size_t i = 0; i < boards.size(); i++) {
+		detector.refineDetectedMarkers(frame, boards[i], corners, ids, rejected);
+	}
+
+	std::vector<cv::Vec3d> foundRvecs, foundTvecs;
+	if (!ids.empty())
+	{
+		for (size_t i = 0; i < boards.size(); i++)
+		{
+			cv::Mat objPoints, imgPoints;
+			boards[i].matchImagePoints(corners, ids, objPoints, imgPoints);
+			if (objPoints.empty() || imgPoints.empty()) {
+				continue; 
+			}
+			cv::Vec3d boardR, boardT;
+			bool valid = cv::solvePnP(objPoints, imgPoints,
+				cameraMatrix, distCoeffs,
+				boardR, boardT);
+			if (valid) {
+				cubeCoordinates(static_cast<int>(i), boardR, boardT,
+					static_cast<float>(markerSideLength),
+					static_cast<float>(markerGapLength));
+				foundRvecs.push_back(boardR);
+				foundTvecs.push_back(boardT);
+			}
+		}
+	}
+
+	cv::Vec3d rvecFinal(0, 0, 0), tvecFinal(0, 0, 0);
+	if (!foundRvecs.empty()) {
+		averageCube(foundRvecs, foundTvecs, rvecFinal, tvecFinal);
+	}
+
+	cv::Mat finalTransform = cv::Mat::eye(4, 4, CV_64F);
+	if (!foundRvecs.empty()) {
+		cv::Mat cubeTransform = buildTransformation(rvecFinal, tvecFinal);
+		finalTransform = headsetMat * cubeTransform;
+	}
+	else {
+		finalTransform = headsetMat.clone();
+	}
+
+	if (showVisualization && !foundRvecs.empty()) {
+		cv::drawFrameAxes(frame,
+			cameraMatrix,
+			distCoeffs,
+			rvecFinal,
+			tvecFinal,
+			static_cast<float>(markerSideLength));
+		cv::imshow("out", frame);
+		cv::waitKey(1);
+	}
+
+	PoseMatrix4x4 result = cvMatToPoseMatrix(finalTransform);
+	return result;
 }
