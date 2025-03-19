@@ -79,7 +79,6 @@ std::vector<cv::aruco::GridBoard> createBoards(float markerSideLength, float mar
 
 		boards.push_back(board);
 
-		// Use the passed-in path for saving
 		std::string name = boardDirPath + "/board" + std::to_string(i) + ".png";
 		cv::imwrite(name, boardImage);
 	}
@@ -104,7 +103,7 @@ static bool initializeOnce(double markerSideLength, double markerGapLength,
 	cv::aruco::Dictionary dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
 	boards = createBoards((float)markerSideLength, (float)markerGapLength, dictionary, boardDirPath);
 
-	cv::aruco::DetectorParameters detectorParams; // defaults
+	cv::aruco::DetectorParameters detectorParams; 
 	detector = cv::aruco::ArucoDetector(dictionary, detectorParams);
 
 	return true;
@@ -247,7 +246,7 @@ TrackerPose getCubePose(bool showVisualization,
 
 	if (!initialized) {
 		if (!initializeOnce(markerSideLengthParam, markerGapLengthParam, calibrationFilePath, boardDirPath)) {
-			// Initialization failed
+	
 			return poseResult;
 		}
 		initialized = true;
@@ -290,7 +289,6 @@ TrackerPose getCubePose(bool showVisualization,
 			cv::Vec3d rvec, tvec;
 			averageCube(rvecs, tvecs, rvec, tvec);
 
-			// Copy results to the struct
 			poseResult.rotation[0] = rvec[0];
 			poseResult.rotation[1] = rvec[1];
 			poseResult.rotation[2] = rvec[2];
@@ -314,101 +312,156 @@ TrackerPose getCubePose(bool showVisualization,
 	return poseResult;
 }
 
-PoseMatrix4x4 getCubePoseMatrix(
-	bool showVisualization,
-	double markerSideLength,
-	double markerGapLength,
-	const std::string& calibrationFilePath,
-	const std::string& boardDirPath,
-	const PoseMatrix4x4& headsetPose)
+static bool initializeTracking(
+    double markerSideLength,
+    double markerGapLength,
+    const std::string& calibrationFilePath,
+    const std::string& boardDirPath)
 {
-	if (!initialized)
-	{
-		if (!inputVideo.open(0)) {
-			std::cerr << "Could not open camera index 0\n";
-			return headsetPose;
-		}
-		if (!readCameraParameters(calibrationFilePath, cameraMatrix, distCoeffs)) {
-			std::cerr << "Failed to read camera params from: " << calibrationFilePath << "\n";
-			return headsetPose;
-		}
-		cv::aruco::Dictionary dict = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
-		boards = createBoards(static_cast<float>(markerSideLength),
-			static_cast<float>(markerGapLength),
-			dict,
-			boardDirPath);
-		cv::aruco::DetectorParameters params;
-		detector = cv::aruco::ArucoDetector(dict, params);
+    if (initialized) {
+        return true;
+    }
+    
+    if (!inputVideo.open(0)) {
+        std::cerr << "Could not open camera index 0\n";
+        return false;
+    }
+    
+    if (!readCameraParameters(calibrationFilePath, cameraMatrix, distCoeffs)) {
+        std::cerr << "Failed to read camera params from: " << calibrationFilePath << "\n";
+        return false;
+    }
+    
+    cv::aruco::Dictionary dict = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
+    boards = createBoards(static_cast<float>(markerSideLength),
+        static_cast<float>(markerGapLength),
+        dict,
+        boardDirPath);
+    
+    cv::aruco::DetectorParameters params;
+    detector = cv::aruco::ArucoDetector(dict, params);
+    
+    initialized = true;
+    return true;
+}
 
-		initialized = true;
-	}
+static bool detectMarkersInFrame(cv::Mat& frame, std::vector<int>& ids,
+    std::vector<std::vector<cv::Point2f>>& corners,
+    std::vector<std::vector<cv::Point2f>>& rejected)
+{
+    if (!inputVideo.grab()) {
+        std::cerr << "Failed to grab frame.\n";
+        return false;
+    }
+    inputVideo.retrieve(frame);
+    
+    detector.detectMarkers(frame, corners, ids, rejected);
+    
+    for (size_t i = 0; i < boards.size(); i++) {
+        detector.refineDetectedMarkers(frame, boards[i], corners, ids, rejected);
+    }
+    
+    return true;
+}
 
-	cv::Mat headsetMat = poseMatrixToCvMat(headsetPose);
+static bool calculateBoardPoses(
+    const std::vector<int>& ids,
+    const std::vector<std::vector<cv::Point2f>>& corners,
+    double markerSideLength,
+    double markerGapLength,
+    std::vector<cv::Vec3d>& foundRvecs,
+    std::vector<cv::Vec3d>& foundTvecs)
+{
+    if (ids.empty()) {
+        return false;
+    }
+    
+    for (size_t i = 0; i < boards.size(); i++)
+    {
+        cv::Mat objPoints, imgPoints;
+        boards[i].matchImagePoints(corners, ids, objPoints, imgPoints);
+        
+        if (objPoints.empty() || imgPoints.empty()) {
+            continue;
+        }
+        
+        cv::Vec3d boardR, boardT;
+        bool valid = cv::solvePnP(objPoints, imgPoints,
+            cameraMatrix, distCoeffs,
+            boardR, boardT);
+            
+        if (valid) {
+            cubeCoordinates(static_cast<int>(i), boardR, boardT,
+                static_cast<float>(markerSideLength),
+                static_cast<float>(markerGapLength));
+            foundRvecs.push_back(boardR);
+            foundTvecs.push_back(boardT);
+        }
+    }
+    
+    return !foundRvecs.empty();
+}
 
-	cv::Mat frame;
-	if (!inputVideo.grab()) {
-		std::cerr << "Failed to grab frame.\n";
-		return headsetPose;
-	}
-	inputVideo.retrieve(frame);
+static void visualizePose(
+    cv::Mat& frame,
+    const cv::Vec3d& rvec,
+    const cv::Vec3d& tvec,
+    float markerSideLength)
+{
+    cv::drawFrameAxes(frame,
+        cameraMatrix,
+        distCoeffs,
+        rvec,
+        tvec,
+        markerSideLength);
+    cv::imshow("out", frame);
+    cv::waitKey(1);
+}
 
-	std::vector<int> ids;
-	std::vector<std::vector<cv::Point2f>> corners, rejected;
-	detector.detectMarkers(frame, corners, ids, rejected);
+PoseMatrix4x4 getCubePoseMatrix(
+    bool showVisualization,
+    double markerSideLength,
+    double markerGapLength,
+    const std::string& calibrationFilePath,
+    const std::string& boardDirPath,
+    const PoseMatrix4x4& headsetPose)
+{
+    // Initialize tracking if needed
+    if (!initializeTracking(markerSideLength, markerGapLength, calibrationFilePath, boardDirPath)) {
+        return headsetPose;
+    }
 
-	for (size_t i = 0; i < boards.size(); i++) {
-		detector.refineDetectedMarkers(frame, boards[i], corners, ids, rejected);
-	}
-
-	std::vector<cv::Vec3d> foundRvecs, foundTvecs;
-	if (!ids.empty())
-	{
-		for (size_t i = 0; i < boards.size(); i++)
-		{
-			cv::Mat objPoints, imgPoints;
-			boards[i].matchImagePoints(corners, ids, objPoints, imgPoints);
-			if (objPoints.empty() || imgPoints.empty()) {
-				continue; 
-			}
-			cv::Vec3d boardR, boardT;
-			bool valid = cv::solvePnP(objPoints, imgPoints,
-				cameraMatrix, distCoeffs,
-				boardR, boardT);
-			if (valid) {
-				cubeCoordinates(static_cast<int>(i), boardR, boardT,
-					static_cast<float>(markerSideLength),
-					static_cast<float>(markerGapLength));
-				foundRvecs.push_back(boardR);
-				foundTvecs.push_back(boardT);
-			}
-		}
-	}
-
-	cv::Vec3d rvecFinal(0, 0, 0), tvecFinal(0, 0, 0);
-	if (!foundRvecs.empty()) {
-		averageCube(foundRvecs, foundTvecs, rvecFinal, tvecFinal);
-	}
-
-	cv::Mat finalTransform = cv::Mat::eye(4, 4, CV_64F);
-	if (!foundRvecs.empty()) {
-		cv::Mat cubeTransform = buildTransformation(rvecFinal, tvecFinal);
-		finalTransform = headsetMat * cubeTransform;
-	}
-	else {
-		finalTransform = headsetMat.clone();
-	}
-
-	if (showVisualization && !foundRvecs.empty()) {
-		cv::drawFrameAxes(frame,
-			cameraMatrix,
-			distCoeffs,
-			rvecFinal,
-			tvecFinal,
-			static_cast<float>(markerSideLength));
-		cv::imshow("out", frame);
-		cv::waitKey(1);
-	}
-
-	PoseMatrix4x4 result = cvMatToPoseMatrix(finalTransform);
-	return result;
+    cv::Mat headsetMat = poseMatrixToCvMat(headsetPose);
+    
+    // Get frame and detect markers
+    cv::Mat frame;
+    std::vector<int> ids;
+    std::vector<std::vector<cv::Point2f>> corners, rejected;
+    if (!detectMarkersInFrame(frame, ids, corners, rejected)) {
+        return headsetPose;
+    }
+    
+    // Calculate poses for detected boards
+    std::vector<cv::Vec3d> foundRvecs, foundTvecs;
+    calculateBoardPoses(ids, corners, markerSideLength, markerGapLength, foundRvecs, foundTvecs);
+    
+    // Average poses and build final transformation
+    cv::Mat finalTransform = cv::Mat::eye(4, 4, CV_64F);
+    if (!foundRvecs.empty()) {
+        cv::Vec3d rvecFinal(0, 0, 0), tvecFinal(0, 0, 0);
+        averageCube(foundRvecs, foundTvecs, rvecFinal, tvecFinal);
+        
+        cv::Mat cubeTransform = buildTransformation(rvecFinal, tvecFinal);
+        finalTransform = headsetMat * cubeTransform;
+        
+        // Visualize if requested
+        if (showVisualization) {
+            visualizePose(frame, rvecFinal, tvecFinal, static_cast<float>(markerSideLength));
+        }
+    } else {
+        finalTransform = headsetMat.clone();
+    }
+    
+    // Convert the final transform to PoseMatrix4x4
+    return cvMatToPoseMatrix(finalTransform);
 }
