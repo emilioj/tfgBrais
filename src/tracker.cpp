@@ -336,6 +336,7 @@ TrackerPose getCubePose(bool showVisualization,
 
 	}
 
+	// Only show visualization if requested
 	if (showVisualization) {
 		cv::imshow("out", frame);
 		cv::waitKey(1);
@@ -438,16 +439,20 @@ static void visualizePose(
     cv::Mat& frame,
     const cv::Vec3d& rvec,
     const cv::Vec3d& tvec,
-    float markerSideLength)
+    float markerSideLength,
+    bool showVisualization)
 {
-    cv::drawFrameAxes(frame,
-        cameraMatrix,
-        distCoeffs,
-        rvec,
-        tvec,
-        markerSideLength);
-    cv::imshow("out", frame);
-    cv::waitKey(1);
+    // Only draw axes and display if visualization is enabled
+    if (showVisualization) {
+        cv::drawFrameAxes(frame,
+            cameraMatrix,
+            distCoeffs,
+            rvec,
+            tvec,
+            markerSideLength);
+        cv::imshow("out", frame);
+        cv::waitKey(1);
+    }
 }
 
 PoseMatrix4x4 getCubePoseMatrix(
@@ -476,10 +481,15 @@ PoseMatrix4x4 getCubePoseMatrix(
     
     // Undistort the image using OpenCV internally
     cv::Mat cvUndistortedImage;
-    cv::undistort(frame, cvUndistortedImage, cameraMatrix, distCoeffs);
-    
-    // Convert the undistorted OpenCV Mat to our generic ImageData format
-    convertMatToImageData(cvUndistortedImage, undistortedImage);
+    if (showVisualization) {
+        // Only undistort the image if visualization is enabled or if undistortedImage will be used
+        cv::undistort(frame, cvUndistortedImage, cameraMatrix, distCoeffs);
+        // Convert the undistorted OpenCV Mat to our generic ImageData format
+        convertMatToImageData(cvUndistortedImage, undistortedImage);
+    } else {
+        // Clear the output image if visualization is disabled
+        undistortedImage = ImageData();
+    }
     
     // Calculate poses for detected boards
     std::vector<cv::Vec3d> foundRvecs, foundTvecs;
@@ -496,7 +506,7 @@ PoseMatrix4x4 getCubePoseMatrix(
         
         // Visualize if requested - using the original frame, not the undistorted one
         if (showVisualization) {
-            visualizePose(frame, rvecFinal, tvecFinal, static_cast<float>(markerSideLength));
+            visualizePose(frame, rvecFinal, tvecFinal, static_cast<float>(markerSideLength), showVisualization);
         }
     } else {
         finalTransform = headsetMat.clone();
