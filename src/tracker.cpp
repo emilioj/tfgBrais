@@ -66,16 +66,13 @@ namespace {
 		imageData.height = mat.rows;
 		imageData.channels = mat.channels();
 
-		// Calculate total size in bytes
 		size_t totalSize = mat.total() * mat.elemSize();
 		imageData.data.resize(totalSize);
 
-		// Copy data if the matrix is continuous
 		if (mat.isContinuous()) {
 			std::memcpy(imageData.data.data(), mat.data, totalSize);
 		}
 		else {
-			// Handle non-continuous matrices - copy row by row
 			size_t rowSize = mat.cols * mat.elemSize();
 			for (int i = 0; i < mat.rows; i++) {
 				std::memcpy(imageData.data.data() + i * rowSize,
@@ -336,7 +333,6 @@ TrackerPose getCubePose(bool showVisualization,
 
 	}
 
-	// Only show visualization if requested
 	if (showVisualization) {
 		cv::imshow("out", frame);
 		cv::waitKey(1);
