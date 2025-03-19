@@ -52,6 +52,38 @@ namespace {
 		return out;
 	}
 
+	// Convert cv::Mat to ImageData
+	void convertMatToImageData(const cv::Mat& mat, ImageData& imageData) {
+		if (mat.empty()) {
+			imageData.data.clear();
+			imageData.width = 0;
+			imageData.height = 0;
+			imageData.channels = 0;
+			return;
+		}
+
+		imageData.width = mat.cols;
+		imageData.height = mat.rows;
+		imageData.channels = mat.channels();
+
+		// Calculate total size in bytes
+		size_t totalSize = mat.total() * mat.elemSize();
+		imageData.data.resize(totalSize);
+
+		// Copy data if the matrix is continuous
+		if (mat.isContinuous()) {
+			std::memcpy(imageData.data.data(), mat.data, totalSize);
+		}
+		else {
+			// Handle non-continuous matrices - copy row by row
+			size_t rowSize = mat.cols * mat.elemSize();
+			for (int i = 0; i < mat.rows; i++) {
+				std::memcpy(imageData.data.data() + i * rowSize,
+					mat.ptr(i), rowSize);
+			}
+		}
+	}
+
 }
 
 bool readCameraParameters(std::string filename, cv::Mat& camMatrix, cv::Mat& distCoeffs)
@@ -424,7 +456,8 @@ PoseMatrix4x4 getCubePoseMatrix(
     double markerGapLength,
     const std::string& calibrationFilePath,
     const std::string& boardDirPath,
-    const PoseMatrix4x4& headsetPose)
+    const PoseMatrix4x4& headsetPose,
+    ImageData& undistortedImage)
 {
     // Initialize tracking if needed
     if (!initializeTracking(markerSideLength, markerGapLength, calibrationFilePath, boardDirPath)) {
@@ -441,6 +474,13 @@ PoseMatrix4x4 getCubePoseMatrix(
         return headsetPose;
     }
     
+    // Undistort the image using OpenCV internally
+    cv::Mat cvUndistortedImage;
+    cv::undistort(frame, cvUndistortedImage, cameraMatrix, distCoeffs);
+    
+    // Convert the undistorted OpenCV Mat to our generic ImageData format
+    convertMatToImageData(cvUndistortedImage, undistortedImage);
+    
     // Calculate poses for detected boards
     std::vector<cv::Vec3d> foundRvecs, foundTvecs;
     calculateBoardPoses(ids, corners, markerSideLength, markerGapLength, foundRvecs, foundTvecs);
@@ -454,7 +494,7 @@ PoseMatrix4x4 getCubePoseMatrix(
         cv::Mat cubeTransform = buildTransformation(rvecFinal, tvecFinal);
         finalTransform = headsetMat * cubeTransform;
         
-        // Visualize if requested
+        // Visualize if requested - using the original frame, not the undistorted one
         if (showVisualization) {
             visualizePose(frame, rvecFinal, tvecFinal, static_cast<float>(markerSideLength));
         }

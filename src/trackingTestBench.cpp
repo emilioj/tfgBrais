@@ -4,10 +4,13 @@
 #include <atomic>
 #include <iostream>
 #include <chrono>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 
 static PoseMatrix4x4 globalPose;
 static std::mutex poseMutex;
 static std::atomic<bool> running(true);
+
 PoseMatrix4x4 makeIdentity()
 {
     PoseMatrix4x4 pose;
@@ -16,6 +19,18 @@ PoseMatrix4x4 makeIdentity()
         // i%5 == 0 picks out diagonal elements (0,5,10,15)
     }
     return pose;
+}
+
+// Helper function to convert our ImageData to cv::Mat for visualization
+cv::Mat imageDataToMat(const ImageData& imageData) {
+    if (imageData.isEmpty()) {
+        return cv::Mat();
+    }
+    
+    cv::Mat result(imageData.height, imageData.width, 
+                  CV_8UC(imageData.channels), 
+                  const_cast<unsigned char*>(imageData.data.data()));
+    return result.clone(); // Clone to ensure we have our own copy of the data
 }
 
 void captureThreadFunc(bool showViz,
@@ -29,18 +44,30 @@ void captureThreadFunc(bool showViz,
 
     while (running)
     {
+        ImageData undistortedImage;
         PoseMatrix4x4 newPose = getCubePoseMatrix(
             showViz,
             markerSideLen,
             markerGapLen,
             calibFile,
             boardsDir,
-            headsetPose
+            headsetPose,
+            undistortedImage
         );
 
         {
             std::lock_guard<std::mutex> lock(poseMutex);
             globalPose = newPose;
+        }
+
+        // Display the undistorted image if available
+        if (!undistortedImage.isEmpty() && showViz) {
+            // Convert to OpenCV Mat for visualization only
+            cv::Mat displayImage = imageDataToMat(undistortedImage);
+            if (!displayImage.empty()) {
+                cv::imshow("Undistorted Image", displayImage);
+                cv::waitKey(1);
+            }
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
