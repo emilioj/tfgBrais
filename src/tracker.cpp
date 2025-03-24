@@ -498,7 +498,14 @@ PoseMatrix4x4 getCubePoseMatrix(
         averageCube(foundRvecs, foundTvecs, rvecFinal, tvecFinal);
         
         cv::Mat cubeTransform = buildTransformation(rvecFinal, tvecFinal);
-        finalTransform = headsetMat * cubeTransform;
+		cv::Mat axisCorrection = cv::Mat::eye(4, 4, CV_64F);
+		axisCorrection.at<double>(1, 1) = -1; // Flip Y axis
+		axisCorrection.at<double>(2, 2) = -1; // Flip Z axis
+
+		// Combine the headset transformation, the cube (marker) transform,
+		// and the axis correction.
+		cv::Mat correctedCubeTransform = cubeTransform * axisCorrection;
+		finalTransform = headsetMat * correctedCubeTransform;
         
         // Visualize if requested - using the original frame, not the undistorted one
         if (showVisualization) {
