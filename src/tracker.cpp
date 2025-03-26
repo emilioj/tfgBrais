@@ -504,9 +504,10 @@ PoseMatrix4x4 getCubePoseMatrix(
 
 		// Combine the headset transformation, the cube (marker) transform,
 		// and the axis correction.
-		cv::Mat correctedCubeTransform = cubeTransform * axisCorrection;
-		finalTransform = headsetMat * correctedCubeTransform;
-        
+		//cv::Mat correctedCubeTransform = cubeTransform * axisCorrection;
+		cv::Mat headsetMatInverse, cubeMatInverse;
+		cv::invert(headsetMat, headsetMatInverse);
+		finalTransform = headsetMatInverse * cubeTransform;
         // Visualize if requested - using the original frame, not the undistorted one
         if (showVisualization) {
             visualizePose(frame, rvecFinal, tvecFinal, static_cast<float>(markerSideLength), showVisualization);
