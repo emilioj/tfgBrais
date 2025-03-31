@@ -497,17 +497,33 @@ PoseMatrix4x4 getCubePoseMatrix(
         cv::Vec3d rvecFinal(0, 0, 0), tvecFinal(0, 0, 0);
         averageCube(foundRvecs, foundTvecs, rvecFinal, tvecFinal);
         
-        cv::Mat cubeTransform = buildTransformation(rvecFinal, tvecFinal);
-		cv::Mat axisCorrection = cv::Mat::eye(4, 4, CV_64F);
-		axisCorrection.at<double>(1, 1) = -1; // Flip Y axis
-		axisCorrection.at<double>(2, 2) = -1; // Flip Z axis
+		// Assuming rvecFinal and tvecFinal have been computed via solvePnP:
+		cv::Mat cubeTransform = buildTransformation(rvecFinal, tvecFinal); // cube->camera view matrix
+		std::cout << "cubeTransform (view matrix from solvePnP):\n" << cubeTransform << "\n";
 
-		// Combine the headset transformation, the cube (marker) transform,
-		// and the axis correction.
-		//cv::Mat correctedCubeTransform = cubeTransform * axisCorrection;
-		cv::Mat headsetMatInverse, cubeMatInverse;
-		cv::invert(headsetMat, headsetMatInverse);
-		finalTransform = headsetMatInverse * cubeTransform;
+		// Invert cubeTransform to get cube's model matrix in camera space.
+		cv::Mat cubeModel;
+		if (cv::invert(cubeTransform, cubeModel)) {
+			std::cout << "cubeModel (inverted cubeTransform):\n" << cubeModel << "\n";
+		}
+		else {
+			std::cerr << "Error inverting cubeTransform\n";
+		}
+
+		// Transpose cubeModel to convert from OpenCV's row-major to OSG's column-major order.
+		cv::Mat cubeModelTransposed;
+		cv::transpose(cubeModel, cubeModelTransposed);
+		std::cout << "cubeModelTransposed (after transpose):\n" << cubeModelTransposed << "\n";
+
+		// headsetMat is already obtained from getInverseViewMatrix and is in world space.
+		cv::Mat headsetMat = poseMatrixToCvMat(headsetPose);
+		std::cout << "headsetMat (from getInverseViewMatrix):\n" << headsetMat << "\n";
+
+		// Now combine the matrices to get the cube's pose in world space.
+	    finalTransform = headsetMat * cubeModelTransposed;
+		std::cout << "finalTransform (headsetMat * cubeModelTransposed):\n" << finalTransform << "\n";
+
+
         // Visualize if requested - using the original frame, not the undistorted one
         if (showVisualization) {
             visualizePose(frame, rvecFinal, tvecFinal, static_cast<float>(markerSideLength), showVisualization);

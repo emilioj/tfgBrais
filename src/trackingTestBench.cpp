@@ -82,13 +82,13 @@ int main()
         {
             std::lock_guard<std::mutex> lock(poseMutex);
             std::cout << "Current 4x4 Pose:\n";
-            for (int row = 0; row < 4; ++row) {
-                std::cout << globalPose.m[row * 4 + 0] << " "
-                    << globalPose.m[row * 4 + 1] << " "
-                    << globalPose.m[row * 4 + 2] << " "
-                    << globalPose.m[row * 4 + 3] << "\n";
-            }
-            std::cout << std::endl;
+            //for (int row = 0; row < 4; ++row) {
+               // std::cout << globalPose.m[row * 4 + 0] << " "
+              //      << globalPose.m[row * 4 + 1] << " "
+              //      << globalPose.m[row * 4 + 2] << " "
+              //      << globalPose.m[row * 4 + 3] << "\n";
+            //}
+            //std::cout << std::endl;
         }
 
         std::this_thread::sleep_for(std::chrono::seconds(1));
