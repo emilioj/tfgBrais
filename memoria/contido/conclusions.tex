@@ -1,0 +1,18 @@
+\chapter{Conclusiones y trabajo futuro}
+\label{chap:c}
+\lettrine{C}{omo} cierre del trabajo, cabe reflexionar sobre el desarrollo del mismo así como sobre su estado actual, y su futuro. Dado por finalizado el trabajo, se han alcanzado buena parte de los objetivos fijados en su concepción:
+
+\begin{itemize}
+\item Se identificaron métodos para la extracción de secciones de \acrshort{tc} así como para el refinado de las mismas.También se analizaron las posibilidades de impresión optimizando el uso de los materiales y de las capacidades de las impresoras. Esto ha permitido trabajar sobre piezas en un nivel más visual e interactivo.
+\item Se ha llevado a cabo un estudio de las soluciones existentes para el seguimiento 3D realizando pruebas de las mismas sobre los datos propios para extraer las ventajas y desventajas de cada solución en un nivel práctico.
+\item Se han diseñado e impreso una gran cantidad de marcadores fiduciarios sobre los que se han realizado pruebas de forma iterativa con el fin de refinar y optimizar el diseño hasta obtener un resultado que satisface las características del proyecto. Todo esto mediante el uso de software libre creando así  un proceso adaptable a otros casos de uso.
+\item Se ha integrado  la solución en el proyecto de \citeauthor{IglesiasGuitian2022} desvirtualizando un posible caso de uso. 
+\end{itemize}
+\subsection{Enriquecimiento Formativo}
+Es imprescindible destacar la vertiente formativa que presenta este trabajo dada su naturaleza como trabajo de fin de grado. El autor ha tenido la posibilidad de trabajar sobre una serie de campos de los mas variados que comprenden la imagen médica, la impresión 3D, la visión artificial, la realidad virtual, el renderizado en un motor de trazado de rayos. Por otra parte, mencionar la exposición a un ambiente investigador en el \acrshort{citic} del que poder empaparse de la forma de trabajar y la cooperación entre iguales. También se trató de una primera puesta en práctica de los conceptos aprendidos sobre la gestión de proyectos que resultó enriquecedora.
+\subsection{Trabajo futuro}
+En la actualidad el proyecto tiene distintas vertientes que pueden ser desarrolladas en el futuro. Por una parte esta la mejora del sistema actual de seguimiento, si bien este en la actualidad es completamente funcional, en sistemas en los que la tasa de refresco de la cámara no es lo suficientemente alto el seguimiento puede dar una sensación de escalonado. Una posible solución sería aplicar algún tipo de filtrado de señales como puede ser un filtro de Kalman, que bien implementado, ayudaría a estimar pasos intermedios entre imágenes para proporcionar una experiencia mas confortable \cite{welch2020kalman}.
+
+Una segunda vertiente de mejora, consistiría en reconstruír sobre las imágenes extraídas del casco, un ambiente de realidad aumentada, en el que se pudieran ver los modelos extraídos de las \acrshort{tc} sobre las mismas, donde aprovechándose de los desarrollos de la interfaz de realidad virtual del proyecto de \citeauthor{IglesiasGuitian2022} se pudiera trabajar con la pieza virtual modificando sus parámetros visuales.
+
+Para terminar, otro posible desarrollo, consistiría en tratar de aumentar la resolución de las imágenes de las cámaras del casco, utilizando las imágenes de cada cámara para crear una imagen compuesta por ambas que permita una mejor detección del marcador fiduciario.

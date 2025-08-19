@@ -1,0 +1,46 @@
+\chapter{Introducción}
+\label{chap:introducion}
+
+\lettrine{E}{l} constante progreso en medicina, y en particular en imagen médica, hace necesario contar con sistemas cada vez más avanzados para la representación y visualización de los datos obtenidos. El progreso en esta área ha sido patente en los últimos 30 años \cite{Botha2014}. Más recientemente, en esta búsqueda de métodos que sean capaces de explotar las mejoras tecnológicas, aparece la aplicación de la realidad aumentada (AR, por sus siglas en inglés) y de otras técnicas englobadas dentro de lo que se conoce como realidad extendida (XR, compendio de realidad virtual, aumentada y mixta) en la medicina \cite{Sielhorst2008}. Un uso efectivo de este tipo de tecnologías en el campo de la imagen médica supone un complemento de gran utilidad para muchas de las tareas del personal médico: diagnóstico, planificación preoperatoria, explicación a pacientes, cirugía guiada por imagen, formación médica, etc.
+
+Este proyecto plantea el uso de piezas creadas con una impresora 3D a partir de imagen médica en un entorno de realidad aumentada, abordando la problemática de su detección y seguimiento para un correcto alineamiento con un modelo 3D virtual, con el objetivo de integrar una imagen sintética sobreimpresa en la imagen real capturada por la cámara.
+
+
+\section{Contexto y motivación}
+
+Varias son las razones que explican el actual auge en la aplicación de técnicas de XR en medicina. Por un lado, la superposición en tiempo real de información digital sobre imagen real facilita la visualización de datos médicos y su interpretación. Esta información extra ayuda al personal sanitario a tener una comprensión más clara y detallada de la anatomía de un paciente, lo que resulta especialmente útil tanto en las fases de diagnóstico como durante procedimientos quirúrgicos complejos, proporcionando información relevante en el campo de visión que sirve como guía en tiempo real durante una intervención. Además, la posibilidad de superponer modelos tridimensionales de estructuras anatómicas en el paciente facilita la planificación precisa de una cirujía, así como la comunicación con el paciente sobre el procedimiento. Por otro lado, la realidad extendida ofrece una herramienta efectiva para la educación y formación médica. Los estudiantes y profesionales sanitarios pueden utilizarla para practicar y simular procedimientos médicos en un entorno virtual realista antes de realizarlos en pacientes reales. Esto brinda la oportunidad de adquirir experiencia y habilidades sin riesgo para los pacientes.
+
+En este proyecto proponemos el uso de piezas creadas con una impresora 3D a partir de imágenes médica en un entorno de realidad aumentada que permita superponer una imagen sintética (un \emph{render} 3D) sobre la visualización de la pieza en la imagen real capturada por la cámara. La idea fundamental es facilitar la manipulación de lo que podría ser una prótesis médica en un entorno de realidad extendida completo. Dentro de ese entorno, la pieza de AR desarrollado en este proyecto se encargaría de la correcta detección y seguimiento de la prótesis, junto a la integración de una imagen virtual superpuesta sobre la misma.
+
+Para el correcto seguimiento y alineación de una pieza física con su imagen virtual en un flujo de vídeo es preciso conocer los parámetros de la cámara y la posición de la misma respeto al objeto. Para la impresión puede extraerse un modelo 3D a partir de una \acrfull{tc}. Con el fin de facilitar el seguimiento es posible que sea preciso añadir marcadores de referencia sobre la pieza, para utilizarlas como guía. En el proyecto se cubrirá el flujo de trabajo completo, desde el análisis y la extracción de un modelo a partir de la \acrshort{tc}, pasando por el diseño de un marcador fiduciario que se usará para hacer el seguimiento del objeto, hasta la manipulación física de la pieza en un entorno de realidad aumentada en la que se proyectará un modelo virtual sobre la pieza impresa vista en imágenes reales.
+
+\section{Objetivos}
+Los objetivos principales de este proyecto son:
+\begin{itemize}
+    \item Extraer un modelo 3D a partir de imágenes capturadas mediante \acrfull{tc} para su impresión. 
+    \item Diseñar un marcador fiduciario que sirva como guía para facilitar el seguimiento de la pieza.
+    \item Hacer detección, seguimiento y alineamiento 3D de la pieza impresa o guía en el flujo de vídeo capturado por un sistema de realidad aumentada, como puede ser un \acrshort{hmd} que incorpore cámaras de vídeo.
+    \item Integrar elementos sintéticos en la imagen real de la visualización 3D.
+    \item El objetivo final es disponer de un software capaz de resolver el problema del seguimiento y la estimación de pose en 3D y que pueda ser fácilmente integrable en un sistema de realidad extendida completo.
+\end{itemize}
+
+\section{Estructura de la memoria}
+
+TODO
+
+%\subsection{Trabajo Previo}
+
+%% Borra esta anotación que che fago no teu seguinte commit
+% {\color{red} Emilio:}
+% {\color{gray} Todo isto iría ao capítulo de Estado del Arte, non?
+%   Este capítulo 1, que habitualmente é un dos máis curtos da memoria,
+%   concluiría coa descrición da estrutura da memoria, que xa faremos
+%   cando teñamos máis ou menos todo escrito.
+% }
+%% Borra o anterior ata aquí
+
+
+
+
+
+
