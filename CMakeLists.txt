@@ -1,34 +1,89 @@
 cmake_minimum_required(VERSION 3.15)
-project(opencv_test LANGUAGES CXX)
+project(ar_obj_renderer LANGUAGES CXX)
 
+# Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
-find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
-
-file(GLOB SOURCES
-    src/*.cpp
-    src/*.hpp
-)
-
-# Enable automatic symbol export
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-add_library(opencv_test SHARED ${SOURCES})
-target_link_libraries(opencv_test ${OpenCV_LIBS})
-set_target_properties(opencv_test PROPERTIES DEBUG_POSTFIX "_d")
+# -----------------------------
+# Core libraries
+# -----------------------------
+find_package(OpenCV REQUIRED)
+find_package(OpenGL REQUIRED)
 
-install(TARGETS opencv_test
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin)
+# -----------------------------
+# Optional graphics libraries
+# -----------------------------
+find_package(GLEW CONFIG QUIET)
+find_package(glfw3 CONFIG QUIET)
+find_package(glm CONFIG QUIET)
 
-file(GLOB HEADERS src/*.h src/*.hpp)
-install(FILES ${HEADERS} DESTINATION include/opencv_test)
+# -----------------------------
+# Collect optional libraries
+# -----------------------------
+set(EXTRA_LIBS "")
 
-# Build the test executable (which uses the main() from trackingTestBench.cpp)
-add_executable(trackingTestBench src/trackingTestBench.cpp)
-target_link_libraries(trackingTestBench opencv_test ${OpenCV_LIBS})
+if(TARGET GLEW::GLEW)
+  list(APPEND EXTRA_LIBS GLEW::GLEW)
+elseif(DEFINED GLEW_LIBRARIES)
+  list(APPEND EXTRA_LIBS ${GLEW_LIBRARIES})
+endif()
 
-# Optionally install the test executable if desired
-install(TARGETS trackingTestBench
-        RUNTIME DESTINATION bin)
+if(TARGET glfw)
+  list(APPEND EXTRA_LIBS glfw)
+elseif(TARGET glfw3::glfw)
+  list(APPEND EXTRA_LIBS glfw3::glfw)
+endif()
+
+if(TARGET glm::glm)
+  list(APPEND EXTRA_LIBS glm::glm)
+endif()
+
+# -----------------------------
+# Include directories
+# -----------------------------
+include_directories(${OpenCV_INCLUDE_DIRS})
+
+# -----------------------------
+# Source files
+# -----------------------------
+set(COMMON_SOURCES
+    src/obj_renderer.cpp
+    src/obj_renderer.h
+    src/marker_tracker.cpp
+    src/marker_tracker.h
+    src/obj_loader.h
+    src/image_data.h
+)
+
+# -----------------------------
+# Data copying
+# -----------------------------
+add_custom_target(copy_calibration_files ALL
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/data/camera_calibration"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+      "${CMAKE_SOURCE_DIR}/data/camera_calibration"
+      "${CMAKE_BINARY_DIR}/data/camera_calibration"
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/data/models"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+      "${CMAKE_SOURCE_DIR}/data/models"
+      "${CMAKE_BINARY_DIR}/data/models"
+    COMMENT "Copying camera calibration files and models to build directory"
+)
+
+
+
+# -----------------------------
+# Executables
+# -----------------------------
+# Main AR application executable
+add_executable(ar_app 
+    src/ar_app.cpp
+    ${COMMON_SOURCES}
+)
+
+# Link libraries
+target_link_libraries(ar_app PRIVATE ${OpenCV_LIBS} ${OPENGL_LIBRARIES} ${EXTRA_LIBS})
+
+# Make sure data is copied before building the executable
+add_dependencies(ar_app copy_calibration_files)
