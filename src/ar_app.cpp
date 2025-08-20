@@ -1,5 +1,6 @@
 #include "marker_tracker.h"
-#include "obj_renderer.h"
+#include "obj_renderer.h" // Keep the original renderer as a fallback
+#include "gl_renderer.h"  // Add the new OpenGL renderer
 #include <thread>
 #include <mutex>
 #include <atomic>
@@ -126,7 +127,7 @@ int main()
     // Create full paths
     std::string calibrationPath = projectPath + "/data/camera_calibration/camera_calibration.txt";
     std::string markersPath = projectPath + "/data/markers/runtime";
-    std::string modelsPath = projectPath + "/data/models/skull/skull.obj";
+    std::string modelsPath = projectPath + "/data/models/skull/skull.fbx";
 
     std::cout << "Using calibration file: " << calibrationPath << std::endl;
     std::cout << "Using markers directory: " << markersPath << std::endl;
@@ -148,28 +149,65 @@ int main()
     fs["camera_matrix"] >> cameraMatrix;
     fs.release();
 
-    // Initialize the OpenCV renderer
-    OpenCVRenderer renderer;
-
     // Get camera resolution (you might want to adapt this to your camera)
     int width = 640;
     int height = 480;
 
-    // Initialize renderer with the OBJ model data
-    if (!renderer.initialize(width, height, modelsPath, cameraMatrix))
+    // Try to initialize the OpenGL renderer first
+    GLRenderer glRenderer;
+    bool useOpenGL = true;
+
+    std::cout << "Attempting to initialize OpenGL renderer..." << std::endl;
+    try
     {
-        std::cerr << "Failed to initialize OpenCV renderer!" << std::endl;
-        running = false;
-        captureThread.join();
-        return 1;
+        if (!glRenderer.initialize(width, height, modelsPath, cameraMatrix))
+        {
+            std::cerr << "Failed to initialize OpenGL renderer! Falling back to OpenCV renderer..." << std::endl;
+            useOpenGL = false;
+        }
+        else
+        {
+            std::cout << "OpenGL renderer initialized successfully!" << std::endl;
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Exception during OpenGL initialization: " << e.what() << std::endl;
+        useOpenGL = false;
+    }
+    catch (...)
+    {
+        std::cerr << "Unknown exception during OpenGL initialization. Falling back to OpenCV renderer." << std::endl;
+        useOpenGL = false;
     }
 
-    // Make the renderer window visible
-    renderer.showWindow(true);
+    // Initialize the OpenCV renderer as a fallback
+    OpenCVRenderer cvRenderer;
+    if (!useOpenGL)
+    {
+        if (!cvRenderer.initialize(width, height, modelsPath, cameraMatrix))
+        {
+            std::cerr << "Failed to initialize OpenCV renderer!" << std::endl;
+            running = false;
+            captureThread.join();
+            return 1;
+        }
+        // Make the OpenCV renderer window visible
+        cvRenderer.showWindow(true);
+    }
+    else
+    {
+        // Make the OpenGL renderer window visible
+        glRenderer.showWindow(true);
+    }
 
     // Main rendering loop
-    while (!renderer.shouldClose())
+    bool shouldClose = false;
+    while (!shouldClose)
     {
+        // Check if we should close the application
+        shouldClose = useOpenGL ? glRenderer.shouldClose() : cvRenderer.shouldClose();
+
         double currentRvec[3], currentTvec[3];
         bool isDetected = false;
         ImageData currentImage;
@@ -196,8 +234,15 @@ int main()
         // Only render if we have a valid marker detection and image
         if (isDetected && !currentImage.isEmpty())
         {
-            // Use renderDirect to render using the rotation and translation vectors directly
-            renderedFrame = renderer.renderDirect(currentRvec, currentTvec, currentImage);
+            // Use renderDirect with the appropriate renderer
+            if (useOpenGL)
+            {
+                renderedFrame = glRenderer.renderDirect(currentRvec, currentTvec, currentImage);
+            }
+            else
+            {
+                renderedFrame = cvRenderer.renderDirect(currentRvec, currentTvec, currentImage);
+            }
         }
         else if (!currentImage.isEmpty())
         {

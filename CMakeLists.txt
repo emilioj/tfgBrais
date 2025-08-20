@@ -11,12 +11,19 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 find_package(OpenCV REQUIRED)
 find_package(OpenGL REQUIRED)
 
+
 # -----------------------------
 # Optional graphics libraries
 # -----------------------------
 find_package(GLEW CONFIG QUIET)
 find_package(glfw3 CONFIG QUIET)
 find_package(glm CONFIG QUIET)
+
+# -----------------------------
+# Assimp for model loading
+# -----------------------------
+find_package(assimp CONFIG REQUIRED)
+
 
 # -----------------------------
 # Collect optional libraries
@@ -39,6 +46,10 @@ if(TARGET glm::glm)
   list(APPEND EXTRA_LIBS glm::glm)
 endif()
 
+if(TARGET assimp::assimp)
+  list(APPEND EXTRA_LIBS assimp::assimp)
+endif()
+
 # -----------------------------
 # Include directories
 # -----------------------------
@@ -48,12 +59,16 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 # Source files
 # -----------------------------
 set(COMMON_SOURCES
-    src/obj_renderer.cpp
-    src/obj_renderer.h
-    src/marker_tracker.cpp
-    src/marker_tracker.h
-    src/obj_loader.h
-    src/image_data.h
+  src/obj_renderer.cpp
+  src/obj_renderer.h
+  src/gl_renderer.cpp
+  src/gl_renderer.h
+  src/marker_tracker.cpp
+  src/marker_tracker.h
+  src/obj_loader.h
+  src/image_data.h
+  src/assimp_loader.cpp
+  src/assimp_loader.h
 )
 
 # -----------------------------
