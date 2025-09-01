@@ -2,7 +2,7 @@
 \label{chap:mygp}
 Este capítulo se centra en la organización del proyecto, la metodología usada y todo lo que a gestión de proyecto se refiere.
 \section{Metodología}
-Para el desarrollo del proyecto se ha decidido por implementar una metodología \textit{Ágile}. Este término se refiere a una metodología regida por una serie de principios que permiten ajustar la forma de trabajo a las condiciones del proyecto. Se debe priorizar a los individuos e interacciones sobre procesos y herramientas, asegurando no perder el valor humano de la comunicación no verbal en el proceso. También se debe atender antes a soluciones funcionales sobre la documentación exhaustiva. Lejos de procurar dejar de lado la documentación, es necesario tener en cuenta que el valor del desarrollo está en la funcionalidad del mismo, por lo que sacrificar tiempo de trabajo por documentar en exceso un proyecto puede acarrear resultados no deseados.
+Para el desarrollo del proyecto se decidió por implementar una metodología \textit{Ágile}. Este término se refiere a una metodología regida por una serie de principios que permiten ajustar la forma de trabajo a las condiciones del proyecto. Se debe priorizar a los individuos e interacciones sobre procesos y herramientas, asegurando no perder el valor humano de la comunicación no verbal en el proceso. También se debe atender antes a soluciones funcionales sobre la documentación exhaustiva. Lejos de procurar dejar de lado la documentación, es necesario tener en cuenta que el valor del desarrollo está en la funcionalidad del mismo, por lo que sacrificar tiempo de trabajo por documentar en exceso un proyecto puede acarrear resultados no deseados.
 Otro pilar en el que se basa esta metodología es la respuesta al cambio sobre los planes preestablecidos, lo que asegura la versatilidad del proyecto aumentando las posibilidades de éxito.
 Dada la naturaleza incremental e iterativa de la metodología \textit{Ágile} es posible dividir el ciclo de vida del proyecto en tareas para facilitar el desarrollo. Esta aproximación permite aplicar el principio de ``Divide y Vencerás'' fragmentando la estimación de las tareas y su desarrollo con el fin de reducir la dificultad en el desarrollo. En la \tablename~\ref{tab:tareas} se pueden ver todas las tareas que se llevaron a cabo junto con la estimación en horas de la misma. Destacar que dada la naturaleza del trabajo de fin de grado, se asume un único recurso humano, y por lo tanto no nos referiremos a las horas como horas por hombre o h x h.
 
@@ -30,7 +30,9 @@ Dada la naturaleza incremental e iterativa de la metodología \textit{Ágile} es
   16    &   Familiarizarse con el uso del \acrshort{hmd}                &   24    \\
   17    &   Ejecutar pruebas de passthrough                             &   2     \\
   18    &   Integrar passthrough en Exposure Render                     &   32    \\
-  
+  19    &   Diseñar alternativa a Exposure Render                       &   10    \\
+  20    &   Implementar alternativa a Exposure Render utilizando OpenGL &   20    \\
+  21    &   Validar alternativa a Exposure Render                       &   5    \\
   \end{tabular}
   \caption{Tareas llevadas a cabo}
   \label{tab:tareas}
@@ -43,13 +45,6 @@ Tras introducir la metodología usada, vamos a detallar los Sprints que tuvieron
 \subsection{Extracción de un modelo a partir de un \acrshort{tc}}
 En este sprint, se tuvo como objetivo el desarrollo de las tareas 1, 2, 3 y 4. Dado que en el estudio previo se encontraron varios caminos disponibles para alcanzar las tareas objetivo, el sprint se consideró viable en todo momento. Este sprint se llevaron a cabo la dentro del tiempo estimado de 2 semanas. El principal riesgo fue la complejidad de la pieza, que en una impresora 3D de filamento común podría haber alargado la impresión, o incluso fallar en el proceso. Esto se minimizó utilizando la impresora Fuse 1+ 30W capaz de imprimir modelos mas complejos a pesar de tener una superficie de impresión mas reducida.
 
-\begin{figure}
-  \centering
-  \includegraphics[angle=90, height= 1.0\textheight]{imaxes/gantt.png}
-  \caption{Diagrama de la planificación del proyecto por sprints}
-  \label{fig:sprint1t}
-\end{figure}
-
 \subsection{Diseño del marcador fiduciario y software de tracking}
 Durante este Sprint, se llevaron a cabo las tareas de la 5 a la 10. En este caso el mayor riesgo fue el tiempo de prototipado, ya que para una única pieza a imprimir, el tiempo de impresión oscila las 15 horas. Para minimizar este riesgo se optó por realizar prototipos sobre papel como se comenta en la ejecución del proyecto. El tiempo estimado para este sprint fue de 3 semanas y media, pero debido a la dificultad de las tareas 7 y 8 se alargó a 5 semanas.
 
@@ -57,4 +52,81 @@ Durante este Sprint, se llevaron a cabo las tareas de la 5 a la 10. En este caso
 Las tareas de la 11 a la 14 se llevaron a cabo en este Sprint. La compilación e instalación de todo el software necesario para ejecutar Exposure Render fue el riesgo por excelencia de este sprint. A pesar de esto se realizo dentro del tiempo estimado para ello ya que se conocía en el momento de la planificación.
 
 \subsection{Integrar passthrough en Exposure Render}
-Se trata del ultimo sprint del proyecto, se llevaron a cabo las tareas de la 14 a la 18. En este sprint, nos encontramos con el mayor imprevisto del proyecto. El \acrshort{sdk} del \acrshort{hmd} no funcionaba correctamente, lo que imposibilitaba la reconstrucción de imágenes y causó un gran retraso en el proyecto respecto a la planificación inicial.
+Se llevaron a cabo las tareas de la 14 a la 18. En este sprint, nos encontramos con el mayor imprevisto del proyecto. El \acrshort{sdk} del \acrshort{hmd} no funcionaba correctamente, lo que imposibilitaba la reconstrucción de imágenes y causó un gran retraso en el proyecto respecto a la planificación inicial.
+
+\subsection{Integrar con motor de render independiente}
+En este sprint se ejecutaron las tareas 19 a 21, centradas en el desarrollo de una alternativa a Exposure Render. Después de varios intentos fallidos de integrar el sistema de seguimiento en Exposure Render durante varias semanas, se decidió descartar esta opción debido a incompatibilidades técnicas y limitaciones en la integración. En su lugar, se diseñó e implementó una solución utilizando un motor de render independiente basado en OpenGL. Se llevaron a cabo pruebas exhaustivas para validar el funcionamiento del sistema y se ajustaron los parámetros necesarios para asegurar una ejecución óptima y estable.
+
+
+\begin{figure}[htbp]
+  \centering
+  \begin{ganttchart}[
+    hgrid,
+    vgrid,
+    time slot unit=day,
+    x unit=0.7cm,
+    y unit chart=0.7cm,
+    bar height=0.6,
+    bar/.style={fill=udcpink!50},
+    group/.style={draw=black, fill=udcgray!25},
+    title/.style={draw=none, fill=none},
+    title height=1,
+    group top shift=0.4,
+    group height=0.3,
+    bar top shift=0.4,
+    title label anchor/.style={below=-1.6ex},
+    bar label anchor/.style={left=2ex},
+    group label anchor/.style={left=2ex},
+    bar label font=\small,
+    group label font=\small
+  ]{1}{16}
+    \gantttitle{Planificación del Proyecto (semanas)}{16} \\
+    \gantttitlelist{1,...,16}{1} \\
+    \ganttgroup{Sprint 1}{1}{2} \\
+    \ganttbar{Importar datos DICOM (T1)}{1}{1} \\
+    \ganttbar{Generar secciones (T2)}{1}{2} \\
+    \ganttbar{Arreglar modelo (T3)}{2}{2} \\
+    \ganttbar{Imprimir modelo (T4)}{2}{2} \\[grid]
+    \ganttgroup{Sprint 2}{3}{7} \\
+    \ganttbar{Instalar librerías (T5)}{3}{3} \\
+    \ganttbar{Familiarizar librería (T6)}{3}{4} \\
+    \ganttbar{Prototipar pruebas (T7)}{4}{6} \\
+    \ganttbar{Implementar tracking (T8)}{5}{7} \\
+    \ganttbar{Testear prototipos (T9)}{6}{7} \\
+    \ganttbar{Generar modelo final (T10)}{7}{7} \\[grid]
+    \ganttgroup{Sprint 3}{8}{10} \\
+    \ganttbar{Imprimir prototipo (T11)}{8}{9} \\
+    \ganttbar{Instalar Exposure (T12)}{8}{10} \\
+    \ganttbar{Familiarizar software (T13)}{9}{10} \\
+    \ganttbar{Integrar tracking (T14)}{10}{10} \\[grid]
+    \ganttgroup{Sprint 4}{11}{13} \\
+    \ganttbar{Instalar HMD (T15)}{11}{11} \\
+    \ganttbar{Familiarizar HMD (T16)}{11}{12} \\
+    \ganttbar{Pruebas passthrough (T17)}{12}{12} \\
+    \ganttbar{Integrar passthrough (T18)}{12}{13} \\[grid]
+    \ganttgroup{Sprint 5}{14}{16} \\
+    \ganttbar{Diseñar alternativa (T19)}{14}{14} \\
+    \ganttbar{Implementar OpenGL (T20)}{14}{15} \\
+    \ganttbar{Validar alternativa (T21)}{15}{16}
+    
+    % Add vertical lines to mark weeks
+    \ganttvrule{S1}{1}
+    \ganttvrule{S2}{2}
+    \ganttvrule{S3}{3}
+    \ganttvrule{S4}{4}
+    \ganttvrule{S5}{5}
+    \ganttvrule{S6}{6}
+    \ganttvrule{S7}{7}
+    \ganttvrule{S8}{8}
+    \ganttvrule{S9}{9}
+    \ganttvrule{S10}{10}
+    \ganttvrule{S11}{11}
+    \ganttvrule{S12}{12}
+    \ganttvrule{S13}{13}
+    \ganttvrule{S14}{14}
+    \ganttvrule{S15}{15}
+    \ganttvrule{S16}{16}
+  \end{ganttchart}
+  \caption{Diagrama de Gantt de la planificación del proyecto}
+  \label{fig:gantt}
+\end{figure}

@@ -1,7 +1,10 @@
-# Modelo de memoria de TFG (Grao en Enxeñaría Informática da FIC UDC)
+# Modelo de memoria de Traballo Fin de Grao
 
 Este proxecto LaTeX constitúe un modelo de referencia para as memorias de Traballo Fin de Grao
-do Grao en Enxeñaría Informática da Facultade de Informática da Universidade da Coruña.
+do **Grao en Enxeñaría Informática** e do **Grao en Ciencia e Enxeñaría de Datos**
+da Facultade de Informática da Universidade da Coruña.
+
+Antes de usar este modelo, por favor, revisa con atención as [`FAQ (Frequently Asked Questions)`](https://gitlab.com/lauramcastro/modelo-tfg-gei-fic/-/wikis/Frequently-asked-questions-(faq)).
 
 ## Estrutura
 
@@ -45,6 +48,8 @@ a memoria en caso de producirse cambios nos diferentes ficheiros que a conforman
 
 ## Eliminación dos ficheiros auxiliares
 
-Os ficheiros auxiliares xerados por `pdflatex` ou `latexmk` poden eliminarse doadamente con:
+No momento no que a redacción da memoria do TFG se dea por finalizada, os ficheiros auxiliares xerados poden eliminarse doadamente con:
 
-     latexmk -c
+     latexmk -xelatex -c
+
+Non se recomenda a eliminación dos ficheiros auxiliares durante o proceso de redacción, xa que a súa presenza contribúe a axilizar o proceso de compilación e xeración do PDF en construción.

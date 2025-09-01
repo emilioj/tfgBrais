@@ -22,12 +22,12 @@ envía a un ordenador que procesa los datos y los convierte en imágenes
 transversales o en secciones longitudinales del área de interés.
 
 \begin{figure}%
-    \centering
-    \subfloat[\centering Orientación del tubo de rayos X respecto al eje corporal.]{{\includegraphics[width=5cm]{imaxes/tac.png} }}%
-    \qquad
-    \subfloat[\centering Tomografía axial computerizada convencional.]{{\includegraphics[width=5cm]{imaxes/tacm.png} }}%
-    \caption{Representación del funcionamiento de un \acrshort{tc}}%
-    \label{fig:tac}%
+	\centering
+	\subfloat[\centering Orientación del tubo de rayos X respecto al eje corporal.]{{\includegraphics[width=5cm]{imaxes/tac.png} }}%
+	\qquad
+	\subfloat[\centering Tomografía axial computerizada convencional.]{{\includegraphics[width=5cm]{imaxes/tacm.png} }}%
+	\caption{Representación del funcionamiento de un \acrshort{tc}}%
+	\label{fig:tac}%
 \end{figure}
 
 La tomografía computarizada proporciona imágenes detalladas de tejidos
@@ -41,7 +41,7 @@ abdominales, entre otros.
 
 
 \paragraph{Teorema de Radon.}
-Propuesto por el matemático austríaco Johann Radon en 1917, el Teorema de Radon es un resultado fundamental en la teoría de la tomografía computerizada. Este teorema establece que es posible reconstruir una función bidimensional a partir de sus proyecciones a lo largo de diferentes ángulos. En el contexto de la tomografía computerizada, las proyecciones se obtienen mediante la medición de la atenuación de la radiación a medida que atraviesa el objeto en estudio.
+Propuesto por el matemático austríaco Johann Radon en 1917, el Teorema de Radon es un resultado fundamental en la teoría de la tomografía computerizada. Este teorema establece que es posible reconstruir una función bidimensional a partir de sus proyecciones a lo largo de diferentes ángulos. En el contexto de la tomografía computerizada, las proyecciones se obtienen mediante la medición de la atenuación de la radiación a medida que atraviesa el cuerpo en estudio.
 %En una TC, se obtienen múltiples proyecciones de rayos X mientras el tubo de rayos X y los detectores giran alrededor del paciente. Estas proyecciones se toman desde diferentes ángulos y se utilizan para capturar información sobre cómo los tejidos dentro del cuerpo absorben los rayos X.
 Una vez que se han recopilado todas las proyecciones, se utiliza un algoritmo de reconstrucción para combinarlas y generar una imagen transversal detallada del área estudiada. La base matemática de ese proceso de reconstrucción de imágenes en la tomografía computerizada la proporciona el teorema de Radon y ha llevado al desarrollo de diversos algoritmos de reconstrucción.
 
@@ -49,9 +49,9 @@ Una vez que se han recopilado todas las proyecciones, se utiliza un algoritmo de
 \paragraph{Algoritmos de reconstrucción de imágenes.}
 Los algoritmos de reconstrucción de imágenes son métodos computacionales utilizados para reconstruir imágenes bidimensionales o tridimensionales a partir de proyecciones adquiridas en la tomografía computerizada. Estos algoritmos se basan en el Teorema de Radon y pueden clasificarse en dos categorías principales: métodos analíticos \cite{kontaxakis2002reconstruccion} y métodos iterativos \cite{Willemink2013}.
 
-1. Métodos analíticos: Estos algoritmos, como la retroproyección filtrada (FBP, por sus siglas en inglés), procesan las proyecciones de manera directa para obtener la imagen reconstruida. La FBP es el algoritmo más utilizado en la práctica clínica debido a su rapidez y eficiencia.
+1. Métodos analíticos: Estos algoritmos, como la \acrfull{fbp}, procesan las proyecciones de manera directa para obtener la imagen reconstruida. La \acrshort{fbp} es el algoritmo más utilizado en la práctica clínica debido a su rapidez y eficiencia.
 
-2. Métodos iterativos: Estos algoritmos, como el de máxima verosimilitud de la expectativa-maximización (MLEM) y el de mínimos cuadrados conjugados (CGLS), utilizan un enfoque iterativo para mejorar la calidad de la imagen reconstruida. Aunque estos métodos suelen ser más lentos que los analíticos, pueden proporcionar imágenes de mayor calidad y son especialmente útiles en aplicaciones donde la cantidad de datos de proyección es limitada o ruidosa.
+2. Métodos iterativos: Estos algoritmos, como el de \acrfull{mlem} y el de \acrfull{cgls}, utilizan un enfoque iterativo para mejorar la calidad de la imagen reconstruida. Aunque estos métodos suelen ser más lentos que los analíticos, pueden proporcionar imágenes de mayor calidad y son especialmente útiles en aplicaciones donde la cantidad de datos de proyección es limitada o ruidosa.
 
 
 
@@ -81,17 +81,17 @@ El \emph{slicer} permite además realizar ajustes en el modelo 3D, con el fin de
 
 En 1994, \citeauthor{Milgram1994ATO}~\cite{Milgram1994ATO} acuñan el término de \emph{virtuality continuum}, que representa una escala que comprende desde la realidad física pura hasta la realidad virtual total, abarcando diferentes niveles de inmersión e interacción. Este \emph{continuum} describe así la gama completa de experiencias, desde la realidad física no modificada hasta entornos completamente virtuales, como se muestra en la \figurename~\ref{fig:vc}:
 \begin{itemize}
-    \item Entorno Real: consiste únicamente en objetos reales (extremo izquierdo de la figura).
-    \item Realidad Aumentada: mundo real aumentado o compuesto por elementos digitales.
-    \item Virtualidad Aumentada: mundo digital aumentado por objetos reales o fisicos.
-    \item Entorno Virtual: entorno puramente virtual (extremo derecho de la figura).
+	\item Entorno Real: consiste únicamente en objetos reales (extremo izquierdo de la figura).
+	\item Realidad Aumentada: mundo real aumentado o compuesto por elementos digitales.
+	\item Virtualidad Aumentada: mundo digital aumentado por objetos reales o fisicos.
+	\item Entorno Virtual: entorno puramente virtual (extremo derecho de la figura).
 \end{itemize}
 
 \begin{figure}
-  \centering
-  \includegraphics[width=0.6\textwidth]{imaxes/virtuality_continuum.png}
-  \caption{Representacion simplificada del concepto de \emph{virtuality continuum}.}
-  \label{fig:vc}
+	\centering
+	\includegraphics[width=0.6\textwidth]{imaxes/virtuality_continuum.png}
+	\caption{Representacion simplificada del concepto de \emph{virtuality continuum}.}
+	\label{fig:vc}
 \end{figure}
 
 \paragraph{Realidad aumentada.}
@@ -101,6 +101,6 @@ Posteriormente \citeauthor{Azuma1997}~\cite{Azuma1997} definía la \acrlong{ar} 
 
 \section{Visión Artificial}
 
-Se denomina visión artificial al campo que incluye los métodos necesarios para adquirir, procesar, analizar y comprender las imágenes del mundo real con el fin de producir información procesable por un ordenador. Esta fuertemente vinculado con la realidad aumentada, ya que es imprescindible para poder transmitir la información del medio al ordenador encargado de generar imágenes correspondientes. 
-Entre los objetivos de la visión artificial se encuentra la capacidad de reconocer patrones dentro de una imagen o vídeo con el fin de poder extraer las características de los objetos dentro de dicho medio y  procesarlas. 
+Se denomina visión artificial al campo que incluye los métodos necesarios para adquirir, procesar, analizar y comprender las imágenes del mundo real con el fin de producir información procesable por un ordenador. Esta fuertemente vinculado con la realidad aumentada, ya que es imprescindible para poder transmitir la información del medio al ordenador encargado de generar imágenes correspondientes.
+Entre los objetivos de la visión artificial se encuentra la capacidad de reconocer patrones dentro de una imagen o vídeo con el fin de poder extraer las características de los objetos dentro de dicho medio y  procesarlas.
 Otro objetivo es la reconstrucción 3D a partir de imágenes, que pretende generar volúmenes 3D desde las imágenes obtenidas, esto es especialmente importante en la realidad aumentada por que permite una mayor percepción de la profundidad sobre el medio generado por ordenador.

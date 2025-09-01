@@ -400,7 +400,26 @@ FodyWeavers.xsd
 /.vscode
 
 /build/*
-memoria/svg-inkscape/flow_exposure_svg-tex.pdf
-memoria/svg-inkscape/flow_exposure_svg-tex.pdf_tex
-memoria/svg-inkscape/flujo_tfg_svg-tex.pdf
-memoria/svg-inkscape/flujo_tfg_svg-tex.pdf_tex
+
+# LaTeX generated files
+memoria/**/*.acn
+memoria/**/*.acr
+memoria/**/*.alg
+memoria/**/*.aux
+memoria/**/*.bbl
+memoria/**/*.blg
+memoria/**/*.fdb_latexmk
+memoria/**/*.fls
+memoria/**/*.glg
+memoria/**/*.glo
+memoria/**/*.gls
+memoria/**/*.ist
+memoria/**/*.lof
+memoria/**/*.log
+memoria/**/*.lot
+memoria/**/*.out
+memoria/**/*.toc
+memoria/**/*.xdv
+memoria/svg-inkscape/*.pdf
+memoria/svg-inkscape/*.pdf_tex
+memoria/indent.log

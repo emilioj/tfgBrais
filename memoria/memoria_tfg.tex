@@ -11,8 +11,7 @@
 \def\nome{Brais Barboza Ordóñez}                             % substitúe aquí o teu nome
 \def\nomedirectorA{José Antonio Iglesias Guitián}              % substitúe aquí o nome de quen dirixe
 \def\nomedirectorB{Francisco Javier Taibo Pena}
-\def\nomedirectorC{Emilio José Padrón González}% duplica esta liña máis veces se o precisas, cambiando
-                                                     % a letra final (A, B, C, D...): úsanse na portada.tex
+\def\nomedirectorC{Emilio José Padrón González}
 \def\titulo{Seguimiento y alineación 3D para la visualización de modelos anatómicos mediante realidad aumentada e impresión 3D} % substitúe aquí o título do teu TFG
 %\def\titulacion{gced}                               % descomenta esta liña e comenta a seguinte se es estudante do GCED
 \def\titulacion{gei}
@@ -36,30 +35,32 @@
 % \usepackage{float}       % permite máis opcións para controlar obxectos flotantes (táboas, figuras)
 % \usepackage{hhline}      % permite personalizar as liñas horizontais en arrays e táboas
   \usepackage{longtable}   % permite construir táboas que ocupan máis dunha páxina
-\usepackage{svg}
 % \usepackage{lscape}      % permite colocar partes do documento en orientación apaisada
 % \usepackage{moreverb}    % permite personalizar o entorno verbatim
-% \usepackage{multirow}    % permite crear celdas que ocupan varias filas da mesma táboa
+  \usepackage{multirow}    % permite crear celdas que ocupan varias filas da mesma táboa
 % \usepackage{pdfpages}    % permite insertar ficheiros en PDF no documento
 % \usepackage{rotating}    % permite diferentes tipos de rotacións para figuras e táboas
 % \usepackage{subcaption}  % permite a inclusión de varias subfiguras nunha figura
 % \usepackage{tabu}        % permite táboas flexibles
 % \usepackage{tabularx}    % permite táboas con columnas de anchura determinada
-
+\usepackage{svg}
+\usepackage{tikz}
+\usepackage{pgfgantt}
+\usepackage{pdflscape}    % Para páginas en formato paisaje
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Corpo                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
 
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- % Preliminares do documento            %
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preliminares do documento            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
- \include{portada/portada}
- \dedicatoria{A mis padres y mi novia} % escribe neste comando o teu texto de dedicatoria
- \paxinaenbranco
- \begin{agradecementos}
+\include{portada/portada}
+\dedicatoria{A mis padres y mi novia} % escribe neste comando o teu texto de dedicatoria
+\paxinaenbranco
+\begin{agradecementos}
  Dedico este logro académico a aquellos que me han brindado su apoyo incondicional en mi camino. A mis tutores Emilio, Jose y Javi, quienes personificaron la guía necesaria para completar este proyecto con éxito. Gracias por vuestras enseñanzas valiosas y por creer en mí.
 
 A mi familia, especialmente a mis padres, por su amor incondicional y por ser mi constante motivación. Gracias por estar a mi lado en cada decisión y por ser mi fuente de inspiración.
@@ -68,49 +69,48 @@ A mis amigos, por su amistad y apoyo en momentos difíciles. Gracias por hacer l
 
 Gracias a todos por ayudarme a alcanzar este objetivo. Este trabajo es el resultado de vuestro apoyo y esfuerzo constante, y está dedicado con todo mi agradecimiento y cariño.
  \end{agradecementos}
- \include{portada/resumo}
+\include{portada/resumo}
 
- \pagenumbering{roman}
- \setcounter{page}{1}
- \bstctlcite{IEEEexample:BSTcontrol}
+\pagenumbering{roman}
+\setcounter{page}{1}
+\bstctlcite{IEEEexample:BSTcontrol}
 
- \tableofcontents
- \listoffigures
- \listoftables
- \clearpage
- 
- \pagenumbering{arabic}
- \setcounter{page}{1}
+\tableofcontents
+\listoffigures
+\listoftables
+\clearpage
 
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- % Capítulos                            %
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{arabic}
+\setcounter{page}{1}
 
- \include{contido/introducion}
- \include{contido/fundamentos_teoricos}
- \include{contido/estado_del_arte}
- \include{contido/herramientas_y_software}
- \include{contido/metodologia_y_gestion_del_proyecto}
- \include{contido/ejecucion_del_pryecto}
- \include{contido/conclusions}
- %\include{contido/Trabajo Futuro.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Capítulos                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- % Apéndices, glosarios e bibliografía  %
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\include{contido/introducion}
+\include{contido/fundamentos_teoricos}
+\include{contido/estado_del_arte}
+\include{contido/herramientas_y_software}
+\include{contido/metodologia_y_gestion_del_proyecto}
+\include{contido/ejecucion_del_proyecto}
+\include{contido/conclusions}
 
- \appendix
- \appendixpage
- %\include{anexos/adicional}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Apéndices, glosarios e bibliografía  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\appendix
+\appendixpage
+\include{anexos/adicional}
 %\include{anexos/...}
 
- \printglossary[type=\acronymtype,title=\nomeglosarioacronimos]
- \printglossary[title=\nomeglosariotermos]
+\printglossary[type=\acronymtype,title=\nomeglosarioacronimos]
+\printglossary[title=\nomeglosariotermos]
 
- \bibliographystyle{IEEEtranN}
- \bibliography{\bibconfig,bibliografia/bibliografia}
- \clearpage
- 
+\bibliographystyle{IEEEtranN}
+\bibliography{\bibconfig,bibliografia/bibliografia}
+\clearpage
+
 \end{document}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

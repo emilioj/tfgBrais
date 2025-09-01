@@ -24,9 +24,11 @@ Es el Entorno de desarrollo de C++ por excelencia en Windows.
 3D Slicer es un programa de software libre diseñado para solventar los problemas mas avanzados de la computación de imagen relacionados con las aplicaciones clínicas y biométricas. Las capacidades del mismo se encuentra la  posibilidad de implementar scripts de python, segmentación de imágenes y volúmenes, la posibilidad de añadir extensiones para aumentar su funcionalidad y la interoperabilidad del estándar \acrshort{dicom} entre otras.
 
 \subsection{Meshmixer}
-Al procurar generar un modelo a partir de una nube de puntos de un TAC, es común encontrarse con que los modelos exportados en STL contienen errores y no pueden ser impresos directamente. Se probaron varias herramientas para solventar estos errores en la estructura de los modelos 3D, pero finalmente Meshmixer (https://www.meshmixer.com) resultó dar los mejores resultados a la hora de arreglar las geometrías con esta casuística can específica.
+Al procurar generar un modelo a partir de una nube de puntos de un TAC, es común encontrarse con que los modelos exportados en STL contienen errores y no pueden ser impresos directamente. Se probaron varias herramientas para solventar estos errores en la estructura de los modelos 3D, pero finalmente \href{https://www.meshmixer.com}{Meshmixer} resultó dar los mejores resultados a la hora de arreglar las geometrías con esta casuística can específica.
+    \subsection{Meshlab}
+Una alternativa de software libre para la reparación de mallas 3D es \href{https://www.meshlab.net}{Meshlab}, que ofrece herramientas similares para limpiar y corregir geometrías de modelos STL.
     \subsection{Blender}
-Blender es la herramienta de software libre para la creación 3D por excelencia.
+Blender es un potente software de modelado, animación, renderizado y edición 3D de código abierto y gratuito. Ofrece una suite completa de herramientas para la creación y manipulación de modelos 3D, incluyendo texturizado, iluminación, simulación física y composición. En este proyecto, se utilizó para procesar y refinar modelos 3D generados a partir de imágenes médicas, aprovechando su flexibilidad para trabajar con formatos como STL y OBJ, y su capacidad para integrar scripts en Python para automatizar tareas.
     \subsection{UltiMaker Cura}
 UltiMaker Cura es el programa desarrollado por UltiMaker para generar el GCODE necesario para imprimir modelos en una impresora de dicha marca. Se utilizó ya que permite importar ajustes específicos de la impresora sobre la que se trabajo de forma sencilla.
 \section{Frameworks}
@@ -137,7 +139,7 @@ Además es posible modificar los siguientes parámetros para adecuar la librerí
 \end{itemize}
 
 \subsubsection*{Extracción de Bits}
-Una vez que se han detectado los contornos de los posibles candidatos en una imagen, se analizan los bits extraídos de cada uno de estos para determinar si en efecto son marcadores o no.
+Los bits extraídos de cada candidato se analizan para determinar si corresponden a marcadores válidos.
 Para ello se somete cada sección de la imagen a una corrección de perspectiva. A continuación se subdivide el candidato en la cantidad previamente establecida en el diccionario de bits que componen cada marcador. Dado que en un bit pueden encontrarse píxeles de los bits contiguos o errores en la imagen capturada por la cámara, se establece el valor del bit en función de la desviación típica de los píxeles de dicho bit, como en el ejemplo de la \figurename~\ref{fig:mbe}.
 
 \begin{figure}
@@ -147,11 +149,11 @@ Para ello se somete cada sección de la imagen a una corrección de perspectiva.
 \end{figure}
 
 \subsubsection*{Identificación de Marcadores}
-Una vez determinados los bits de los que esta compuesto cada candidato a marcador es necesario determinar si el código extraído pertenece al diccionario y en caso de ser necesario aplicar algoritmos de corrección de errores.
+Se verifica si el código extraído pertenece al diccionario y, en caso necesario, se aplican algoritmos de corrección de errores.
 La primera operación consiste en determinar la cantidad de bits erróneos permitidos en el borde de un marcador, ya que todos los marcadores ARuco cuentan al menos con un bit de borde. En lo que a corrección de errores se refiere, cada diccionario cuenta con un límite teórico de bits que pueden ser corregidos.
 
 \subsubsection*{Refinado de Esquinas}
-Una vez se han detectado e identificado todos los marcadores es posible realizar  un refinado a nivel de subpíxel de las esquinas para favorecer a la precisión del sistema. Este ultimo paso es altamente costoso a nivel computacional, pero se recomienda en aplicaciones en las que prima la precisión como es el caso.
+Se puede realizar un refinado a nivel de subpíxel de las esquinas para mejorar la precisión del sistema. Este ultimo paso es altamente costoso a nivel computacional, pero se recomienda en aplicaciones en las que prima la precisión como es el caso.
 
 Esta librería trabaja con un Pinhole Camera Model lo que quiere decir que se considera como el origen de coordenadas el punto en el que todos los rayos de lux convergerían en una supuesta cámara estenopeica ideal.
 
