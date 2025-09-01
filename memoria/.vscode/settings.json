@@ -1,0 +1,72 @@
+{
+    // Enable auto-build on save for live PDF updates
+    "latex-workshop.latex.autoBuild.run": "onSave",
+    // Use xelatex for proper fontspec support
+    "latex-workshop.latex.tools": [
+        {
+            "name": "xelatex",
+            "command": "xelatex",
+            "args": [
+                "--max-print-line=10000",
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "-shell-escape",
+                "%DOC%"
+            ]
+        },
+        {
+            "name": "bibtex",
+            "command": "bibtex",
+            "args": ["%DOCFILE%"]
+        },
+        {
+            "name": "makeglossaries",
+            "command": "makeglossaries",
+            "args": ["%DOCFILE%"]
+        },
+        {
+            "name": "clean",
+            "command": "latexmk",
+            "args": [
+                "-C",
+                "%DOC%"
+            ]
+        }
+    ],
+    "latex-workshop.latex.recipes": [
+        {
+            "name": "xelatex -> bibtex -> xelatex*2 -> makeglossaries -> xelatex",
+            "tools": [
+                "xelatex",
+                "bibtex",
+                "xelatex",
+                "xelatex",
+                "makeglossaries",
+                "xelatex"
+            ]
+        }
+    ],
+    "latex-workshop.latex.clean.fileTypes": [
+        "aux", "bbl", "blg", "fdb_latexmk", "fls", "log", "out", "toc", "lof", "lot", "acn", "acr", "alg", "glg", "glo", "gls", "ist", "nav", "snm", "xdv", "bcf", "run.xml"
+    ]
+    ,
+    // Suppress datatool dialect warnings in Problems panel
+    "latex-workshop.message.ignore": [
+        "No `datatool' support for dialect"
+    ],
+    // Enable forward/inverse search with SumatraPDF external viewer
+    "latex-workshop.view.pdf.viewer": "external",
+    "latex-workshop.view.pdf.external.viewer.command": "C:/Users/brais/AppData/Local/SumatraPDF/SumatraPDF.exe",
+    "latex-workshop.view.pdf.external.synctex.command": "C:/Users/brais/AppData/Local/SumatraPDF/SumatraPDF.exe",
+    "latex-workshop.view.pdf.external.synctex.args": [
+        "-forward-search",
+        "%TEX%",
+        "%LINE%",
+        "-reuse-instance",
+        "-inverse-search",
+        "\"C:\\Users\\brais\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe\" \"C:\\Users\\brais\\AppData\\Local\\Programs\\Microsoft VS Code\\resources\\app\\out\\cli.js\" --ms-enable-electron-run-as-node -r -g \"%f:%l\"",
+        "%PDF%"
+    ],
+    "latex-workshop.synctex.afterBuild.enabled": true
+}
