@@ -9,10 +9,10 @@ Este capítulo tiene como objetivo tratar el desarrollo del proyecto en sí mism
 \section{Análisis}
 Se llevó a cabo un estudio para definir la hoja de ruta del proyecto. Dada la problemática a solventar, este trabajo alcanza a tocar áreas bien diferenciadas entre si que se pueden destacar como los pasos a seguir del mismo:
 \begin{itemize}
-    \item Extracción de volúmenes 3D a partir de un \acrshort{tc} válidos para su impresión.
-    \item Diseñar un marcador fiduciario que permita el seguimiento de una pieza en 3 dimensiones y un método de acople al volumen previamente impreso.
-    \item Implementar una solución que permita el seguimiento de dicho marcador.
-    \item Integrar la solución sobre un \acrshort{hmd}.
+	\item Extracción de volúmenes 3D a partir de un \acrshort{tc} válidos para su impresión.
+	\item Diseñar un marcador fiduciario que permita el seguimiento de una pieza en 3 dimensiones y un método de acople al volumen previamente impreso.
+	\item Implementar una solución que permita el seguimiento de dicho marcador.
+	\item Integrar la solución sobre un \acrshort{hmd}.
 \end{itemize}
 
 Fruto de la investigación surge el artículo de  \citeauthor{MoretaMartinez2020}; que expone una solución existente a los objetivos de este trabajo mediante el uso de software bajo licencia o de pago.  Es por ello que se toma una aproximación similar al problema, sobre todo en las fases iniciales, para la generación de los volúmenes a pesar de implementar una solución propia para lo que a seguimiento se refiere. Este estudio también permitió especificar los requisitos necesarios para el software de tracking.
@@ -22,10 +22,10 @@ Uno de los principales requisitos debe ser la robustez del sistema frente a las 
 Este trabajo nace como un desarrollo del proyecto troncal de \citeauthor{IglesiasGuitian2022}, y como tal, debe ceñirse a ciertas pautas del mismo. Exposure Render cuenta con un módulo de realidad virtual, en el que se integrará la solución de tracking para lograr un control mas natural sobre el modelo a tratar, moviéndose en las imágenes renderizadas a la par que se mueve en la realidad, como se muestra en el diagrama de secuencia de la \figurename~\ref{fig:flow_exposure}.
 
 \begin{figure}
-  \centering
-  \includegraphics[width=0.75\textwidth]{imaxes/flow_exposure.png}
-  \caption{Flujo de integración del seguimiento en Exposure Render.}
-  \label{fig:flow_exposure}
+	\centering
+	\includegraphics[width=0.75\textwidth]{imaxes/flow_exposure.png}
+	\caption{Flujo de integración del seguimiento en Exposure Render.}
+	\label{fig:flow_exposure}
 \end{figure}
 
 \section{Generación de volúmenes a partir de TC}
@@ -44,24 +44,24 @@ Al abrir el programa se pueden ver las vistas, en las que se representará el \a
 Se utilizo principalmente la herramienta de ``Thresholding'' que permite seleccionar partes del modelo cuyas intensidades se comprenden en un intervalo o ``threshold'' (ver \figurename~\ref{fig:seg_cr}). Posteriormente, para la eliminación de las partes del modelo no deseadas, se utilizó la herramienta de borrado hasta alcanzar el volumen deseado.
 
 \begin{figure}
-  \centering
-  \begin{subfigure}{.4\textwidth}
-    \includegraphics[width=\textwidth]{imaxes/manix_full.png}
-    \caption{TC usado en el desarrollo.}\label{fig:manix_full}
-  \end{subfigure}
-  \begin{minipage}[b]{.47\textwidth}
-    \begin{subfigure}{\textwidth}
-      \centering
-      \includegraphics[width=\textwidth]{imaxes/captura3dslicer_2.png}
-      \caption{ Captura de pantalla de 3DSlicer con los datos cargados.}\label{fig:3dslier}
-    \end{subfigure}\\
-    \begin{subfigure}{\textwidth}
-      \centering
-      \includegraphics[width=\textwidth]{imaxes/segment_craneo.png}
-      \caption{ Captura de pantalla de 3DSlicer del torso una vez aplicado el thresholding.}\label{fig:seg_cr}
-    \end{subfigure}
-  \end{minipage}
-  \caption{\acrshort{tc} de partida y obtención del modelo 3D final con 3DSlicer.}
+	\centering
+	\begin{subfigure}{.4\textwidth}
+		\includegraphics[width=\textwidth]{imaxes/manix_full.png}
+		\caption{TC usado en el desarrollo.}\label{fig:manix_full}
+	\end{subfigure}
+	\begin{minipage}[b]{.47\textwidth}
+		\begin{subfigure}{\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{imaxes/captura3dslicer_2.png}
+			\caption{ Captura de pantalla de 3DSlicer con los datos cargados.}\label{fig:3dslier}
+		\end{subfigure}\\
+		\begin{subfigure}{\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{imaxes/segment_craneo.png}
+			\caption{ Captura de pantalla de 3DSlicer del torso una vez aplicado el thresholding.}\label{fig:seg_cr}
+		\end{subfigure}
+	\end{minipage}
+	\caption{\acrshort{tc} de partida y obtención del modelo 3D final con 3DSlicer.}
 \end{figure}
 
 % \begin{figure}%
@@ -81,80 +81,133 @@ Se utilizo principalmente la herramienta de ``Thresholding'' que permite selecci
 % \end{figure}
 
 \section{Impresión 3D del volumen}
- Durante el proceso de segmentación y exportación del modelo, pueden surgir inconsistencias geométricas debido a que el modelo se genera directamente de los datos volumétricos del TC, en lugar de construirse a partir de primitivas geométricas predefinidas. Estas irregularidades, que incluyen superficies no continuas o vértices mal conectados, impedirían un correcto proceso de Slicing y, por consiguiente, la generación adecuada del archivo GCODE necesario para la impresión 3D. Para solucionar este problema, se utilizó el software Meshmixer, una herramienta especializada en la reparación y optimización de mallas 3D. Como se muestra en la \figurename~\ref{fig:arr_geo}, el modelo exportado presenta varios puntos problemáticos, señalados por marcadores, que corresponden a errores geométricos derivados del proceso de exportación. Una vez corregidos estos defectos mediante las herramientas de reparación de Meshmixer, el modelo quedó preparado para su impresión.
+Durante el proceso de segmentación y exportación del modelo, pueden surgir inconsistencias geométricas debido a que el modelo se genera directamente de los datos volumétricos del TC, en lugar de construirse a partir de primitivas geométricas predefinidas. Estas irregularidades, que incluyen superficies no continuas o vértices mal conectados, impedirían un correcto proceso de Slicing y, por consiguiente, la generación adecuada del archivo GCODE necesario para la impresión 3D. Para solucionar este problema, se utilizó el software Meshmixer, una herramienta especializada en la reparación y optimización de mallas 3D. Como se muestra en la \figurename~\ref{fig:arr_geo}, el modelo exportado presenta varios puntos problemáticos, señalados por marcadores, que corresponden a errores geométricos derivados del proceso de exportación. Una vez corregidos estos defectos mediante las herramientas de reparación de Meshmixer, el modelo quedó preparado para su impresión.
 
 \begin{figure}
-  \centering
-  \includegraphics[width=0.6\textwidth]{imaxes/arreglo_geo.png}
-  \caption{Modelo de cráneo 3D con geometrías erróneas.}
-  \label{fig:arr_geo}
+	\centering
+	\includegraphics[width=0.6\textwidth]{imaxes/arreglo_geo.png}
+	\caption{Modelo de cráneo 3D con geometrías erróneas.}
+	\label{fig:arr_geo}
 \end{figure}
 
- Como se comenta en el Capítulo \ref{chap:hs}, para una pieza con una geometría tan compleja, se requeriría una gran cantidad de soportes. Debido a esto, se optó por la impresora Fuse 1 para la impresión de este modelo. A diferencia de una impresora 3D al uso, esta impresora utiliza un láser para fijar capa a capa el polvo de nylon, lo que garantiza una gran resolución en la pieza final y una gran durabilidad de la misma. 
+Como se comenta en el Capítulo \ref{chap:hs}, para una pieza con una geometría tan compleja, se requeriría una gran cantidad de soportes. Debido a esto, se optó por la impresora Fuse 1 para la impresión de este modelo. A diferencia de una impresora 3D al uso, esta impresora utiliza un láser para fijar capa a capa el polvo de nylon, lo que garantiza una gran resolución en la pieza final y una gran durabilidad de la misma.
 
- Posterior al  trabajo de impresión es necesario retirar el material sobrante en la cámara de recuperación que cuenta con distintos utensilios para evitar malgastar el material sobrante ya que puede ser reutilizado.
+Posterior al  trabajo de impresión es necesario retirar el material sobrante en la cámara de recuperación que cuenta con distintos utensilios para evitar malgastar el material sobrante ya que puede ser reutilizado.
 
 \begin{figure}%
-    \centering
-    \subfloat[\centering Pieza en el proceso de recuperación del material.]{{\includegraphics[width=.4\textwidth]{imaxes/limpiando_fig.png} }}%
-    \qquad
-    \subfloat[\centering  Pieza final.]{{\includegraphics[width=.4\textwidth]{imaxes/limpia_fig.png} }}%
-    \caption{Proceso de recuperación de material.}%
-    \label{fig:limpieza}%
+	\centering
+	\subfloat[\centering Pieza en el proceso de recuperación del material.]{{\includegraphics[width=.4\textwidth]{imaxes/limpiando_fig.png} }}%
+	\qquad
+	\subfloat[\centering  Pieza final.]{{\includegraphics[width=.4\textwidth]{imaxes/limpia_fig.png} }}%
+	\caption{Proceso de recuperación de material.}%
+	\label{fig:limpieza}%
 \end{figure}
 
 \section{Desarrollo del marcador fiduciario}
+\label{sec:marcador_fiduciario}
+
+\subsection{Planteamiento del problema y selección de la solución}
 Obtener la posición y rotación de una figura desconocida en el espacio es uno de los problemas principales a la hora de implementar soluciones de realidad virtual o aumentada, ya que requiere encontrar correspondencias entre objetos conocidos en el espacio y sus proyecciones en el vídeo.
 
-Si bien existen aproximaciones que buscan puntos claves de las figuras o reconocen sus geometrías mediante técnicas de visión artificial e inteligencia artificial, se optó por el uso de  marcadores fiduciarios por varios motivos.
+Si bien existen aproximaciones que buscan puntos claves de las figuras o reconocen sus geometrías mediante técnicas de visión artificial e inteligencia artificial, se optó por el uso de  marcadores fiduciarios por varios motivos:
 
-Primeramente, permite replicar el seguimiento del objeto independientemente del hardware utilizado, ya que una vez calibrada la cámara no se requiere ningún otro tipo de ajuste en el sistema. Otra ventaja es la robustez del sistema, ya que permite mantener el seguimiento a pesar de que parte del marcador se encuentre ocluido o no esté en el campo de visión de la cámara.
-Dados los recursos disponibles, se optó por utilizar la librería ARuco para generar y seguir el marcador.
+\begin{itemize}
+    \item \textbf{Independencia del hardware}: Permite replicar el seguimiento del objeto independientemente del hardware utilizado, ya que una vez calibrada la cámara no se requiere ningún otro tipo de ajuste en el sistema.
+    \item \textbf{Robustez frente a oclusiones}: Permite mantener el seguimiento a pesar de que parte del marcador se encuentre ocluido o no esté completamente en el campo de visión de la cámara.
+    \item \textbf{Simplicidad de implementación}: Dados los recursos disponibles, se optó por utilizar la librería ARuco para generar y seguir el marcador, aprovechando su madurez y estabilidad.
+\end{itemize}
+
+\subsection{Fundamentos teóricos del seguimiento con ARuco}
 
 ARuco a la hora de detectar la posición de un marcador, trabaja con un modelo de coordenadas pin-hole, donde las coordenadas y rotación de los objetos detectados se expresan en función de la posición de la cámara.
 El calibrado de la cámara permite determinar la proyección de cualquier punto en las 3 dimensiones del espacio en el sensor de la cámara. En una cámara ideal, un punto 3D $(X, Y, Z)$ en el espacio se proyectaría en el píxel:
 \begin{align*}
-x &= \frac{X \cdot fx}{Z} + cx & y = \frac{Y \cdot fy}{Z} + cy
+	x & = \frac{X \cdot fx}{Z} + cx & y = \frac{Y \cdot fy}{Z} + cy
 \end{align*}
 Donde:
 \begin{itemize}
-\item $fx$, $fy$: Es la longitud focal de la lente de la cámara en ambos ejes.
-\item $cx$, $cy$: Es el centro óptico del sensor (expresado en píxeles).
-\item $k1$, $k2$, $p1$, $p2$, $k3$: Son los coeficientes de distorsión radial y tangencial que permiten corregir las distorsiones introducidas por la lente real.
+	\item $fx$, $fy$: Es la longitud focal de la lente de la cámara en ambos ejes.
+	\item $cx$, $cy$: Es el centro óptico del sensor (expresado en píxeles).
+	\item $k1$, $k2$, $p1$, $p2$, $k3$: Son los coeficientes de distorsión radial y tangencial que permiten corregir las distorsiones introducidas por la lente real.
 \end{itemize}
 Asumiendo que la ubicación tridimensional del punto con respecto al sistema de referencia de la cámara es conocida. Si se desea conocer la proyección de un punto referido a un sistema de referencia arbitrario, entonces deben mencionarse parámetros extrínsecos. Los parámetros extrínsecos consisten básicamente en las rotaciones tridimensionales (Rvec = {Rx, Ry, Rz}) y las traslaciones tridimensionales (Tvec = {Tx, Ty, Tz}) requeridas para trasladar el sistema de referencia de la cámara al sistema arbitrario. Los elementos de rotación se expresan mediante la fórmula de Rodrigues \cite{mebius2007derivation}, por lo que es posible obtener la matriz de rotación equivalente de 3x3 utilizando la función cv::Rodrigues() de OpenCV.
 
 Cada marcador detectado devuelve como coordenadas la esquina superior izquierda del mismo, o lo que se etiqueta en el ejemplo de la \figurename~\ref{fig:marker_schema} como \emph{corner 0}, en forma de (Rvec = {Rx, Ry, Rz}) como vector de rotación y (Tvec = {Tx, Ty, Tz}) como vector de translación.
 
 \begin{figure}
-  \centering
-  \includegraphics[width=0.5\textwidth]{imaxes/marker_schema.png}
-  \caption{Esquema de un marcador.}
-  \label{fig:marker_schema}
+	\centering
+	\includegraphics[width=0.5\textwidth]{imaxes/marker_schema.png}
+	\caption{Esquema de un marcador.}
+	\label{fig:marker_schema}
 \end{figure}
 
-Detectar un solo marcador puede fallar por diferentes razones, como malas condiciones de iluminación, movimiento rápido de la cámara, obstrucciones, etc. Para superar ese problema, ArUco permite el uso de tablas de marcadores como la mostrada en la \figurename~\ref{fig:board_schema}. Cada tabla de marcadores está compuesta por varios marcadores en ubicaciones conocidas. Presentan dos ventajas principales. Primero, dado que hay más de un marcador, es menos probable perderlos todos al mismo tiempo. Segundo, cuanto más marcadores se detecten, más puntos están disponibles para calcular los parámetros extrínsecos de la cámara. Como consecuencia, se obtiene una mayor precisión. 
+Detectar un solo marcador puede fallar por diferentes razones, como malas condiciones de iluminación, movimiento rápido de la cámara, obstrucciones, etc. Para superar ese problema, ArUco permite el uso de tablas de marcadores como la mostrada en la \figurename~\ref{fig:board_schema}. Cada tabla de marcadores está compuesta por varios marcadores en ubicaciones conocidas. Presentan dos ventajas principales. Primero, dado que hay más de un marcador, es menos probable perderlos todos de vista al mismo tiempo. Segundo, cuanto más marcadores se detecten, más puntos están disponibles para calcular los parámetros extrínsecos de la cámara. Como consecuencia, se obtiene una mayor precisión.
 
 \begin{figure}
-  \centering
-  \includegraphics[width=0.4\textwidth, angle=90]{imaxes/board_schema.png}
-  \caption{Esquema de una tabla de marcadores.}
-  \label{fig:board_schema}
+	\centering
+	\includegraphics[width=0.4\textwidth, angle=90]{imaxes/board_schema.png}
+	\caption{Esquema de una tabla de marcadores.}
+	\label{fig:board_schema}
 \end{figure}
 
+\subsection{Generación de marcadores a partir de diccionarios predefinidos}
+El marcador fiduciario utilizado en este proyecto se genera a partir de un diccionario predefinido de ArUco. En la implementación actual se emplea el diccionario \texttt{DICT\_6X6\_250}, que contiene 250 marcadores únicos de 6×6 bits cada uno. Este diccionario fue seleccionado por ofrecer un buen equilibrio entre:
 
-Debido a la versatilidad de las piezas con las que se pretende usar el marcador, se implementó priorizando eliminar las oclusiones del marcador por la pieza, por este motivo se diseñó como un cubo, de forma que al menos una cara sería visible en todo momento. 
+\begin{itemize}
+    \item \textbf{Robustez en la detección}: Los marcadores de 6×6 bits proporcionan suficiente información para una detección fiable incluso con cierta degradación de la imagen.
+    \item \textbf{Capacidad del diccionario}: Con 250 marcadores únicos disponibles, hay suficientes IDs para implementar múltiples cubos sin conflictos.
+    \item \textbf{Replicabilidad}: Al usar un diccionario estándar, los experimentos son fácilmente reproducibles.
+\end{itemize}
+
+La generación del cubo marcador sigue un esquema sistemático donde cada cara del cubo contiene una matriz 2×2 de marcadores del mismo diccionario. Los identificadores (IDs) de los marcadores se asignan secuencialmente siguiendo la fórmula:
+
+\begin{center}
+\texttt{firstId = cara\_id * 4}\\
+\texttt{ids = \{firstId, firstId + 1, firstId + 2, firstId + 3\}}
+\end{center}
+
+Donde \texttt{cara\_id} corresponde al número de cara del cubo (0-5). De esta forma:
+\begin{itemize}
+	\item Cara 0: marcadores con IDs 0, 1, 2, 3
+	\item Cara 1: marcadores con IDs 4, 5, 6, 7
+	\item Cara 2: marcadores con IDs 8, 9, 10, 11
+	\item Cara 3: marcadores con IDs 12, 13, 14, 15
+	\item Cara 4: marcadores con IDs 16, 17, 18, 19
+	\item Cara 5: marcadores con IDs 20, 21, 22, 23
+\end{itemize}
+
+Esta implementación permite utilizar cualquier diccionario predefinido o personalizado de ArUco, siempre y cuando el diccionario contenga al menos 24 marcadores únicos y se respete el orden secuencial de asignación de IDs para cada cara. La modularidad del sistema permite cambiar el diccionario sin necesidad de alterar la lógica de seguimiento del cubo.
+
+\subsection{Algoritmo de cálculo de pose del cubo}
+\label{subsec:algoritmo_pose}
+
+El proceso de determinación de la pose del cubo se realiza en varias etapas que transforman las detecciones individuales de cada cara en una pose unificada del centro del cubo.
+
+\subsubsection{Transformación de coordenadas de cara a centro}
+Cuando ARuco detecta una cara del cubo, devuelve la posición y orientación correspondientes a la esquina superior izquierda de esa cara (corner 0 en la \figurename~\ref{fig:marker_schema}). Para obtener la pose del centro del cubo, es necesario aplicar una transformación que tenga en cuenta tanto la posición como la orientación actual del marcador.
+
+\subsection{Diseño geométrico del marcador cúbico}
+
+Debido a la versatilidad de las piezas con las que se pretende usar el marcador, se implementó priorizando eliminar las oclusiones del marcador por la pieza. Por este motivo se diseñó como un cubo, de forma que al menos una cara sería visible en todo momento. Se evaluaron otras formas geométricas (prismas rectangulares, pirámides, cilindros), pero estas demostraron menor efectividad de detección con la cámara utilizada en el desarrollo.
+
+El diseño final consiste en un cubo donde cada cara contiene una matriz 2×2 de marcadores del mismo diccionario ARuco. Esta configuración proporciona las siguientes ventajas:
+
+\begin{itemize}
+    \item \textbf{Redundancia}: Al tener múltiples marcadores por cara, el sistema puede mantener el tracking incluso si algunos marcadores están ocluidos.
+    \item \textbf{Precisión mejorada}: La detección de múltiples marcadores en la misma cara permite calcular la pose con mayor precisión mediante promediado.
+    \item \textbf{Robustez}: La forma cúbica garantiza que siempre habrá al menos una cara visible desde cualquier ángulo de observación.
+\end{itemize}
 
 Se llevaron a cabo pruebas con distintos diccionarios de marcadores, modificando las tolerancias para los márgenes entre marcadores y los bordes del cubo con el fin de poder mantener unas dimensiones manejables sin comprometer el tamaño de cada marcador individual.
-Finalmente, fruto de los tests, se llegó al cubo de la \figurename~\ref{fig:cubo_marker}, que cuenta con una matriz 2 x 2 de marcadores del mismo diccionario en cada cara.
+Finalmente, fruto de los tests, se llegó al cubo de la \figurename~\ref{fig:cubo_marker}.
 
 El cubo se descompone como se puede ver en la \figurename~\ref{fig:cube_layout}. En un primer momento la detección devuelve la posición y rotación de cada cara de forma individual. Dado que se busca la posición del centro del cubo, sobre cada valor obtenido, se aplica una transformación que tiene en cuenta tanto la posición como la orientación actual del marcador. La función \texttt{moveAxis} calcula el desplazamiento necesario para cada eje utilizando la matriz de rotación (obtenida mediante la fórmula de Rodrigues) para asegurar que el desplazamiento se realiza en la dirección correcta respecto a la orientación actual del marcador. Este proceso se aplica para los tres ejes como se muestra a continuación:
 
 \begin{figure}
-  \centering
-  \includegraphics[width=0.4\textwidth]{imaxes/cube_layout.png}
-  \caption{Layout de las caras del marcador fiduciario.}
-  \label{fig:cube_layout}
+	\centering
+	\includegraphics[width=0.4\textwidth]{imaxes/cube_layout.png}
+	\caption{Layout de las caras del marcador fiduciario.}
+	\label{fig:cube_layout}
 \end{figure}
 
 \begin{lstlisting}[language=C++]
@@ -207,40 +260,57 @@ void cubeCoordinates(int id, cv::Vec3d& rvecs, cv::Vec3d& tvecs, float sideLengt
 }
 \end{lstlisting}
 
+\subsubsection{Fusión de múltiples detecciones}
+Cuando se detectan múltiples caras del cubo simultáneamente (hasta 3 caras pueden ser visibles en una sola imagen), el sistema debe combinar las estimaciones individuales para obtener una pose más precisa y estable. El algoritmo implementado utiliza un promediado simple de los vectores de traslación y rotación.
+
+El promediado de vectores de rotación requiere especial atención debido a la naturaleza circular de las rotaciones y posibles discontinuidades en la representación de Rodrigues. El sistema implementa verificaciones para evitar promediar rotaciones que difieran significativamente, lo que podría indicar detecciones erróneas o ambigüedades en la orientación.
+
 
 \begin{figure}%
-    \centering
-    \subfloat[\centering Modelo del marcador fiduciario.]{{\includegraphics[width=6cm]{imaxes/cubo_marker.png} }}%
-    \qquad
-    \subfloat[\centering  Impresión del marcador fiduciario.]{{\includegraphics[width=6cm]{imaxes/cubo_marker_imp.png} }}%
-    \caption{Diseño final del marcador fiduciario.}%
-    \label{fig:cubo_marker}%
+	\centering
+	\subfloat[\centering Modelo del marcador fiduciario.]{{\includegraphics[width=6cm]{imaxes/cubo_marker.png} }}%
+	\qquad
+	\subfloat[\centering  Impresión del marcador fiduciario.]{{\includegraphics[width=6cm]{imaxes/cubo_marker_imp.png} }}%
+	\caption{Diseño final del marcador fiduciario.}%
+	\label{fig:cubo_marker}%
 \end{figure}
 
-En caso de que únicamente se detectase una cara del cubo, los vectores de rotación y translación finales serían los obtenidos llegados a este punto, pero es posible que se detecten hasta 3 caras en una única imagen. En estos casos se selecciona como resultado la media de los valores obtenidos en cada cara como se ve en la figura \figurename~\ref{fig:cubo_detected}.
+En caso de que únicamente se detectase una cara del cubo, los vectores de rotación y translación finales serían los obtenidos llegados a este punto. Como se observa en la \figurename~\ref{fig:cubo_detected}, es posible detectar hasta 3 caras simultáneamente en una única imagen, lo que permite aplicar el algoritmo de fusión descrito anteriormente para obtener una estimación más robusta de la pose.
 
 \begin{figure}%
-    \centering
-    \subfloat[\centering Ejemplo de detección del cubo.]{{\includegraphics[width=6cm]{imaxes/cube_detected.png} }}%
-    \qquad
-    \subfloat[\centering Ejemplo de detección del cubo con oclusión.]{{\includegraphics[width=6cm]{imaxes/cube_detected_ocluded.png} }}%
-    \caption{Imágenes sobre las que se estima la pose del cubo.}%
-    \label{fig:cubo_detected}%
+	\centering
+	\subfloat[\centering Ejemplo de detección del cubo.]{{\includegraphics[width=6cm]{imaxes/cube_detected.png} }}%
+	\qquad
+	\subfloat[\centering Ejemplo de detección del cubo con oclusión.]{{\includegraphics[width=6cm]{imaxes/cube_detected_ocluded.png} }}%
+	\caption{Imágenes sobre las que se estima la pose del cubo.}%
+	\label{fig:cubo_detected}%
 \end{figure}
 
-Hasta ahora, se ha descrito el comportamiento de la aplicación para una única imagen. Sin embargo, aplicar este comportamiento a una fuente de vídeo apenas modifica el comportamiento. Una vez obtenidos los valores, simplemente hay que esperar a la siguiente imagen y volver a ejecutar el bucle de detección sobre la siguiente hasta que se desee terminar el programa. En la figura \figurename~\ref{fig:flujo_tfg} se puede apreciar el flujo aquí descrito.
+\subsubsection{Procesamiento de secuencias de vídeo}
+Hasta ahora, se ha descrito el comportamiento de la aplicación para una única imagen. El procesamiento de secuencias de vídeo consiste en aplicar iterativamente este algoritmo a cada frame de la secuencia. Una vez obtenidos los valores de pose para un frame, el sistema espera al siguiente frame y ejecuta nuevamente el pipeline de detección. En la \figurename~\ref{fig:flujo_tfg} se ilustra el flujo completo del algoritmo, desde la captura de imagen hasta la obtención de la pose final del cubo.
+
+El diagrama muestra claramente las etapas principales del proceso implementado:
+\begin{enumerate}
+    \item \textbf{Inicialización del sistema}: Apertura de la cámara, carga de parámetros de calibración, creación de las tablas de marcadores para cada cara del cubo e inicialización del detector ARuco.
+    \item \textbf{Captura de frame}: Obtención del frame de vídeo desde la cámara.
+    \item \textbf{Detección de marcadores}: Identificación inicial de marcadores ARuco en la imagen.
+    \item \textbf{Refinamiento de detección}: Mejora de la precisión de detección aplicando el refinamiento específico para cada tabla de marcadores del cubo.
+    \item \textbf{Procesamiento por cara}: Para cada una de las seis caras del cubo, se calculan las correspondencias entre puntos de imagen y puntos del objeto 3D.
+    \item \textbf{Cálculo de pose individual}: Estimación de pose mediante solvePnP para cada cara que tenga correspondencias válidas.
+    \item \textbf{Transformación al centro}: Conversión de las coordenadas de cada cara al centro del cubo utilizando las transformaciones geométricas correspondientes.
+    \item \textbf{Promediado de poses}: Combinación de todas las poses válidas obtenidas para generar una estimación final más robusta.
+    \item \textbf{Comunicación de resultados}: Retorno de la pose final calculada o pose vacía si no se detectaron marcadores.
+\end{enumerate}
 
 \begin{figure}
-  \centering
-  \includesvg[width=16cm]{imaxes/flujo_tfg.svg}
-  \caption{Diagrama de flujo de la solución de tracking.}
-  \label{fig:flujo_tfg}
+	\centering
+	\includegraphics[width=0.8\textwidth]{imaxes/flujo_tfg_correcto.png}
+	\caption{Diagrama de flujo de la solución de tracking implementada.}
+	\label{fig:flujo_tfg}
 \end{figure}
 
-
-
 \section{Implementación del Passthrough en Exposure Render}
-Para la obtención de imágenes sobre las que poder trabajar se utilizaron las propias cámaras frontales del HTC Vive Pro 2. Se trata de un par de cámaras colocadas longitudinalmente a lo largo del frontal del casco, que permiten su uso en aplicaciones de realidad aumentada y realidad mixta. 
+Para la obtención de imágenes sobre las que poder trabajar se utilizaron las propias cámaras frontales del HTC Vive Pro 2. Se trata de un par de cámaras colocadas longitudinalmente a lo largo del frontal del casco, que permiten su uso en aplicaciones de realidad aumentada y realidad mixta.
 Para acceder a estas cámaras se debe hacer uso de SRworks C++ SDK.
 
 Este software en el momento del desarrollo del trabajo, en su versión nativa, presentaba errores que imposibilitaron la reconstrucción de la imagen para ser visualizada en el casco.
