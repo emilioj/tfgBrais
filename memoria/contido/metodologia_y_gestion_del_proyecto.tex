@@ -4,39 +4,9 @@ Este capítulo se centra en la organización del proyecto, la metodología usada
 \section{Metodología}
 Para el desarrollo del proyecto se decidió por implementar una metodología \textit{Ágile}. Este término se refiere a una metodología regida por una serie de principios que permiten ajustar la forma de trabajo a las condiciones del proyecto. Se debe priorizar a los individuos e interacciones sobre procesos y herramientas, asegurando no perder el valor humano de la comunicación no verbal en el proceso. También se debe atender antes a soluciones funcionales sobre la documentación exhaustiva. Lejos de procurar dejar de lado la documentación, es necesario tener en cuenta que el valor del desarrollo está en la funcionalidad del mismo, por lo que sacrificar tiempo de trabajo por documentar en exceso un proyecto puede acarrear resultados no deseados.
 Otro pilar en el que se basa esta metodología es la respuesta al cambio sobre los planes preestablecidos, lo que asegura la versatilidad del proyecto aumentando las posibilidades de éxito.
-Dada la naturaleza incremental e iterativa de la metodología \textit{Ágile} es posible dividir el ciclo de vida del proyecto en tareas para facilitar el desarrollo. Esta aproximación permite aplicar el principio de ``Divide y Vencerás'' fragmentando la estimación de las tareas y su desarrollo con el fin de reducir la dificultad en el desarrollo. En la \tablename~\ref{tab:tareas} se pueden ver todas las tareas que se llevaron a cabo junto con la estimación en horas de la misma. Destacar que dada la naturaleza del trabajo de fin de grado, se asume un único recurso humano, y por lo tanto no nos referiremos a las horas como horas por hombre o h x h.
+Dada la naturaleza incremental e iterativa de la metodología \textit{Ágile} es posible dividir el ciclo de vida del proyecto en tareas para facilitar el desarrollo. Esta aproximación permite aplicar el principio de ``Divide y Vencerás'' fragmentando la estimación de las tareas y su desarrollo con el fin de reducir la dificultad en el desarrollo. 
 
-\begin{table}
-  \centering
-  \rowcolors{2}{white}{udcgray!25}
-  \begin{tabular}{c|c|c}
-  \rowcolor{udcpink!25}
-  \textbf{Nº} & \textbf{Funcionalidad}& \textbf{Estimación (H)} \\\hline
-  1     &   Importar datos en formato \acrshort{dicom} en 3D Slicer.    &   2     \\
-  2     &   Generar secciones para poder exportar de 3DSlicer.          &   40    \\
-  3     &   Arreglar el modelo para que se viables para impresión.      &   12    \\
-  4     &   Imprimir modelo.                                            &   15    \\
-  5     &   Instalar librerías necesarias para el desarrollo.           &   4     \\
-  6     &   Familiarizarse con la librería.                             &   12    \\
-  7     &   Prototipar pruebas para tests.                              &   40    \\
-  8     &   Implementar herramienta para tracking del marcador.         &   40    \\  
-  9     &   Testear prototipos.                                         &   25    \\
-  10    &   Generar modelo a partir el prototipo final.                 &   33    \\
-  11    &   Imprimir prototipo final.                                   &   16    \\
-  12    &   Instalar y compilar Exposure Render.                        &   80    \\
-  13    &   Familiarizarse con el software y sistema de trabajo.        &   19    \\
-  14    &   Integrar software de tracking en Exposure Render            &   24    \\
-  15    &   Instalar software necesario para el \acrshort{hmd}          &   2     \\
-  16    &   Familiarizarse con el uso del \acrshort{hmd}                &   24    \\
-  17    &   Ejecutar pruebas de passthrough                             &   2     \\
-  18    &   Integrar passthrough en Exposure Render                     &   32    \\
-  19    &   Diseñar alternativa a Exposure Render                       &   10    \\
-  20    &   Implementar alternativa a Exposure Render utilizando OpenGL &   20    \\
-  21    &   Validar alternativa a Exposure Render                       &   5    \\
-  \end{tabular}
-  \caption{Tareas llevadas a cabo}
-  \label{tab:tareas}
-\end{table}
+El proyecto se organizó en 21 tareas principales, agrupadas en 6 sprints, con una estimación total de 584 horas de trabajo. Destacar que dada la naturaleza del trabajo de fin de grado, se asume un único recurso humano, y por lo tanto no nos referiremos a las horas como horas por hombre o h x h. La tabla detallada de tareas con las estimaciones específicas se puede consultar en el Apéndice~\ref{chap:diagramas_detallados}.
 
 Para llevar a cabo las tareas se optó por un desarrollo en \textit{Sprints}. Los sprints son los períodos de tiempo en los que se llevan a cabo las tareas. Estos se acotaron en el tiempo, dándoles siempre una longitud determinada, y a su vez se acotaron en funcionalidad procurando siempre que finalicen alcanzando algún hito del proyecto. Estos bloques o \textit{Sprints} se fueron definiendo a lo largo del proyecto, adaptándose a las necesidades y riesgos del mismo.
 
@@ -57,76 +27,5 @@ Se llevaron a cabo las tareas de la 14 a la 18. En este sprint, nos encontramos 
 \subsection{Integrar con motor de render independiente}
 En este sprint se ejecutaron las tareas 19 a 21, centradas en el desarrollo de una alternativa a Exposure Render. Después de varios intentos fallidos de integrar el sistema de seguimiento en Exposure Render durante varias semanas, se decidió descartar esta opción debido a incompatibilidades técnicas y limitaciones en la integración. En su lugar, se diseñó e implementó una solución utilizando un motor de render independiente basado en OpenGL. Se llevaron a cabo pruebas exhaustivas para validar el funcionamiento del sistema y se ajustaron los parámetros necesarios para asegurar una ejecución óptima y estable.
 
-
-\begin{figure}[htbp]
-  \centering
-  \begin{ganttchart}[
-    hgrid,
-    vgrid,
-    time slot unit=day,
-    x unit=0.7cm,
-    y unit chart=0.7cm,
-    bar height=0.6,
-    bar/.style={fill=udcpink!50},
-    group/.style={draw=black, fill=udcgray!25},
-    title/.style={draw=none, fill=none},
-    title height=1,
-    group top shift=0.4,
-    group height=0.3,
-    bar top shift=0.4,
-    title label anchor/.style={below=-1.6ex},
-    bar label anchor/.style={left=2ex},
-    group label anchor/.style={left=2ex},
-    bar label font=\small,
-    group label font=\small
-  ]{1}{16}
-    \gantttitle{Planificación del Proyecto (semanas)}{16} \\
-    \gantttitlelist{1,...,16}{1} \\
-    \ganttgroup{Sprint 1}{1}{2} \\
-    \ganttbar{Importar datos DICOM (T1)}{1}{1} \\
-    \ganttbar{Generar secciones (T2)}{1}{2} \\
-    \ganttbar{Arreglar modelo (T3)}{2}{2} \\
-    \ganttbar{Imprimir modelo (T4)}{2}{2} \\[grid]
-    \ganttgroup{Sprint 2}{3}{7} \\
-    \ganttbar{Instalar librerías (T5)}{3}{3} \\
-    \ganttbar{Familiarizar librería (T6)}{3}{4} \\
-    \ganttbar{Prototipar pruebas (T7)}{4}{6} \\
-    \ganttbar{Implementar tracking (T8)}{5}{7} \\
-    \ganttbar{Testear prototipos (T9)}{6}{7} \\
-    \ganttbar{Generar modelo final (T10)}{7}{7} \\[grid]
-    \ganttgroup{Sprint 3}{8}{10} \\
-    \ganttbar{Imprimir prototipo (T11)}{8}{9} \\
-    \ganttbar{Instalar Exposure (T12)}{8}{10} \\
-    \ganttbar{Familiarizar software (T13)}{9}{10} \\
-    \ganttbar{Integrar tracking (T14)}{10}{10} \\[grid]
-    \ganttgroup{Sprint 4}{11}{13} \\
-    \ganttbar{Instalar HMD (T15)}{11}{11} \\
-    \ganttbar{Familiarizar HMD (T16)}{11}{12} \\
-    \ganttbar{Pruebas passthrough (T17)}{12}{12} \\
-    \ganttbar{Integrar passthrough (T18)}{12}{13} \\[grid]
-    \ganttgroup{Sprint 5}{14}{16} \\
-    \ganttbar{Diseñar alternativa (T19)}{14}{14} \\
-    \ganttbar{Implementar OpenGL (T20)}{14}{15} \\
-    \ganttbar{Validar alternativa (T21)}{15}{16}
-    
-    % Add vertical lines to mark weeks
-    \ganttvrule{S1}{1}
-    \ganttvrule{S2}{2}
-    \ganttvrule{S3}{3}
-    \ganttvrule{S4}{4}
-    \ganttvrule{S5}{5}
-    \ganttvrule{S6}{6}
-    \ganttvrule{S7}{7}
-    \ganttvrule{S8}{8}
-    \ganttvrule{S9}{9}
-    \ganttvrule{S10}{10}
-    \ganttvrule{S11}{11}
-    \ganttvrule{S12}{12}
-    \ganttvrule{S13}{13}
-    \ganttvrule{S14}{14}
-    \ganttvrule{S15}{15}
-    \ganttvrule{S16}{16}
-  \end{ganttchart}
-  \caption{Diagrama de Gantt de la planificación del proyecto}
-  \label{fig:gantt}
-\end{figure}
+\section{Planificación temporal}
+La planificación temporal del proyecto se organizó en sprints de duración variable, adaptándose a la complejidad de las tareas y los riesgos identificados. El diagrama de Gantt completo con la distribución temporal detallada de todas las tareas se puede consultar en el Apéndice~\ref{chap:diagramas_detallados}.

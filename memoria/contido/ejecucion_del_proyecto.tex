@@ -184,7 +184,7 @@ El diseño final consiste en un cubo donde cada cara contiene una matriz 2×2 de
 Se llevaron a cabo pruebas con distintos diccionarios de marcadores, modificando las tolerancias para los márgenes entre marcadores y los bordes del cubo con el fin de poder mantener unas dimensiones manejables sin comprometer el tamaño de cada marcador individual.
 Finalmente, fruto de los tests, se llegó al cubo de la \figurename~\ref{fig:cubo_marker}.
 
-El cubo se descompone como se puede ver en la \figurename~\ref{fig:cube_layout}. En un primer momento la detección devuelve la posición y rotación de cada cara de forma individual. Dado que se busca la posición del centro del cubo, sobre cada valor obtenido, se aplica una transformación que tiene en cuenta tanto la posición como la orientación actual del marcador. La función \texttt{moveAxis} calcula el desplazamiento necesario para cada eje utilizando la matriz de rotación (obtenida mediante la fórmula de Rodrigues) para asegurar que el desplazamiento se realiza en la dirección correcta respecto a la orientación actual del marcador. Este proceso se aplica para los tres ejes como se muestra a continuación:
+El cubo se descompone como se puede ver en la \figurename~\ref{fig:cube_layout}. En un primer momento la detección devuelve la posición y rotación de cada cara de forma individual. Dado que se busca la posición del centro del cubo, sobre cada valor obtenido, se aplica una transformación que tiene en cuenta tanto la posición como la orientación actual del marcador. 
 
 \begin{figure}
 	\centering
@@ -193,55 +193,11 @@ El cubo se descompone como se puede ver en la \figurename~\ref{fig:cube_layout}.
 	\label{fig:cube_layout}
 \end{figure}
 
-\begin{lstlisting}[language=C++]
-cv::Vec3d moveAxis(cv::Vec3d& tvec, cv::Vec3d rvec, double distance, int axis)
-{
-    cv::Mat rotationMatrix, rotationMatrixTransposed;
-    Rodrigues(rvec, rotationMatrix);
-    rotationMatrixTransposed = rotationMatrix.t();
-    double* rz = rotationMatrixTransposed.ptr<double>(axis); // x=0, y=1, z=2
-    tvec[0] -= rz[0] * distance;
-    tvec[1] -= rz[1] * distance;
-    tvec[2] -= rz[2] * distance;
-    return tvec;
-}
-tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH, 0);
-tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH, 1);
-tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH, 2);
+La función \texttt{moveAxis} calcula el desplazamiento necesario para cada eje utilizando la matriz de rotación (obtenida mediante la fórmula de Rodrigues) para asegurar que el desplazamiento se realiza en la dirección correcta respecto a la orientación actual del marcador. Este proceso se aplica para los tres ejes.
 
-\end{lstlisting}
+Una vez ajustada la posición del centro, es necesario corregir la orientación de cada cara para mantener un sistema de coordenadas consistente en todo el cubo. La función \texttt{cubeCoordinates} aplica las rotaciones necesarias según la cara detectada, usando la cara 0 como referencia. Las rotaciones se realizan sobre los ejes X, Y, y Z mediante funciones específicas que aplican transformaciones angulares usando radianes (donde $\pi$ radianes equivale a 180 grados).
 
-Una vez ajustada la posición del centro, es necesario corregir la orientación de cada cara para mantener un sistema de coordenadas consistente en todo el cubo. La función \texttt{cubeCoordinates} aplica las rotaciones necesarias según la cara detectada, usando la cara 0 como referencia. Las rotaciones se realizan sobre los ejes X, Y, y Z mediante las funciones \texttt{rotateXAxis}, \texttt{rotateYAxis}, y \texttt{rotateZAxis}, que aplican transformaciones angulares usando radianes (donde $\pi$ radianes equivale a 180 grados):
-\begin{lstlisting}[language=C++]
-void cubeCoordinates(int id, cv::Vec3d& rvecs, cv::Vec3d& tvecs, float sideLength)
-{
-    tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH, 0);
-    tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH, 1);
-    tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH, 2);
-    switch (id)
-    {
-    case 1://cara 1
-        rvecs = rotateXAxis(rvecs, -M_PI / 2);
-        break;
-    case 2://cara 2
-        rvecs = rotateXAxis(rvecs, M_PI);
-        break;
-    case 3://cara 3
-        rvecs = rotateYAxis(rvecs, M_PI / 2);
-        rvecs = rotateZAxis(rvecs, M_PI);
-        break;
-    case 4://cara 4
-        rvecs = rotateXAxis(rvecs, M_PI);
-        rvecs = rotateYAxis(rvecs, -M_PI / 2);
-        break;
-    case 5://cara 5
-        rvecs = rotateXAxis(rvecs, M_PI / 2);
-        break;
-    default://La cara 0 no precisa rotar
-        break;
-    }
-}
-\end{lstlisting}
+Los detalles completos de la implementación de estas funciones, incluyendo el código fuente, se pueden consultar en el Apéndice~\ref{chap:detalles_implementacion}.
 
 \subsubsection{Fusión de múltiples detecciones}
 Cuando se detectan múltiples caras del cubo simultáneamente (hasta 3 caras pueden ser visibles en una sola imagen), el sistema debe combinar las estimaciones individuales para obtener una pose más precisa y estable. El algoritmo implementado utiliza un promediado simple de los vectores de traslación y rotación.
@@ -270,7 +226,7 @@ En caso de que únicamente se detectase una cara del cubo, los vectores de rotac
 \end{figure}
 
 \subsubsection{Procesamiento de secuencias de vídeo}
-Hasta ahora, se ha descrito el comportamiento de la aplicación para una única imagen. El procesamiento de secuencias de vídeo consiste en aplicar iterativamente este algoritmo a cada frame de la secuencia. Una vez obtenidos los valores de pose para un frame, el sistema espera al siguiente frame y ejecuta nuevamente el pipeline de detección. En la \figurename~\ref{fig:flujo_tfg} se ilustra el flujo completo del algoritmo, desde la captura de imagen hasta la obtención de la pose final del cubo.
+Hasta ahora, se ha descrito el comportamiento de la aplicación para una única imagen. El procesamiento de secuencias de vídeo consiste en aplicar iterativamente este algoritmo a cada frame de la secuencia. Una vez obtenidos los valores de pose para un frame, el sistema espera al siguiente frame y ejecuta nuevamente el pipeline de detección.
 
 El diagrama muestra claramente las etapas principales del proceso implementado:
 \begin{enumerate}
@@ -285,12 +241,7 @@ El diagrama muestra claramente las etapas principales del proceso implementado:
     \item \textbf{Comunicación de resultados}: Retorno de la pose final calculada o pose vacía si no se detectaron marcadores.
 \end{enumerate}
 
-\begin{figure}
-	\centering
-	\includegraphics[width=0.8\textwidth]{imaxes/flujo_tfg_correcto.png}
-	\caption{Diagrama de flujo de la solución de tracking implementada.}
-	\label{fig:flujo_tfg}
-\end{figure}
+El diagrama de flujo completo del algoritmo, desde la captura de imagen hasta la obtención de la pose final del cubo, se puede consultar en el Apéndice~\ref{chap:diagramas_detallados}.
 
 \section{Implementación del Passthrough en Exposure Render}
 \subsection{Captura de imagen}
@@ -304,28 +255,9 @@ Con el fin de no aumentar la cantidad de dependencias de un proyecto de la enver
 La integración del sistema de tracking ARuco en Exposure Render se realizó como una librería independiente que proporciona la funcionalidad de seguimiento de marcadores fiduciarios. El punto central de esta integración es la función \texttt{getCubePoseMatrix}, que actúa como interfaz principal entre el sistema de tracking y la aplicación de realidad aumentada.
 
 \subsubsection{Función getCubePoseMatrix}
-La función \texttt{getCubePoseMatrix} es la interfaz principal que proporciona la pose del cubo marcador en el espacio tridimensional:
+La función \texttt{getCubePoseMatrix} es la interfaz principal que proporciona la pose del cubo marcador en el espacio tridimensional. Los parámetros de esta función incluyen configuraciones para visualización, dimensiones físicas del marcador, rutas de calibración y directorios de configuración.
 
-\begin{lstlisting}[language=C++]
-PoseMatrix4x4 getCubePoseMatrix(
-    bool showVisualization,
-    double markerSideLength,
-    double markerGapLength,
-    const std::string& calibrationFilePath,
-    const std::string& boardDirPath,
-    ImageData& undistortedImage);
-\end{lstlisting}
-
-Los parámetros de esta función tienen los siguientes propósitos:
-
-\begin{itemize}
-    \item \textbf{showVisualization}: Activa o desactiva la visualización en tiempo real del tracking para fines de depuración y validación.
-    \item \textbf{markerSideLength}: Especifica la longitud física del lado de cada marcador individual en metros, necesaria para calcular la escala correcta.
-    \item \textbf{markerGapLength}: Define la separación física entre marcadores en la superficie del cubo, utilizada para determinar las dimensiones reales del objeto.
-    \item \textbf{calibrationFilePath}: Ruta al archivo de calibración de la cámara que contiene los parámetros intrínsecos y de distorsión.
-    \item \textbf{boardDirPath}: Directorio que contiene las definiciones de las tablas de marcadores para cada cara del cubo.
-    \item \textbf{undistortedImage}: Referencia de salida que contiene la imagen procesada y corregida para su uso en visualización.
-\end{itemize}
+Los detalles completos de la signatura de esta función y sus parámetros se pueden consultar en el Apéndice~\ref{chap:detalles_implementacion}.
 
 \subsubsection{Implementación como hilo independiente}
 Para minimizar la latencia y mantener la fluidez del renderizado principal, el sistema de tracking se implementó como un hilo independiente mediante la clase \texttt{Tracking} que encapsula toda la funcionalidad de seguimiento.
@@ -353,47 +285,15 @@ Esta arquitectura asegura que el hilo principal de renderizado no se vea bloquea
 
 Para facilitar la integración con Exposure Render, la librería de tracking utiliza la estructura \texttt{PoseMatrix4x4}, que representa una matriz de 4×4. Esta estructura encapsula tanto la rotación como la traslación del marcador en el espacio 3D.
 
-La función \texttt{getCubePoseMatrix} implementa una serie de transformaciones para que la pose del cubo detectada por ARuco sea directamente utilizable por el motor de renderizado de Exposure Render. El proceso de transformación se desarrolla en las siguientes etapas:
+La función \texttt{getCubePoseMatrix} implementa una serie de transformaciones para que la pose del cubo detectada por ARuco sea directamente utilizable por el motor de renderizado de Exposure Render. El proceso incluye:
 
-\paragraph{Transformación del espacio de cámara al espacio del cubo}
-ARuco proporciona la pose del marcador como vectores de rotación y traslación (\texttt{rvec}, \texttt{tvec}) que representan la transformación del sistema de coordenadas del objeto al sistema de coordenadas de la cámara. Estos vectores se convierten en una matriz de transformación 4×4 usando la fórmula de Rodrigues para la rotación:
+\begin{enumerate}
+    \item \textbf{Transformación del espacio de cámara al espacio del cubo}: Conversión de vectores de rotación y traslación a matriz de transformación 4×4.
+    \item \textbf{Inversión para obtener la matriz modelo}: Conversión de la matriz de vista en matriz modelo.
+    \item \textbf{Conversión de sistemas de coordenadas}: Compatibilización entre el orden row-major de OpenCV y column-major de OSG.
+\end{enumerate}
 
-\begin{lstlisting}[language=C++]
-cv::Mat cubeTransform = buildTransformation(rvecFinal, tvecFinal);
-\end{lstlisting}
-
-Esta matriz representa la transformación \gls{viewmatrix} del cubo respecto a la cámara.
-
-\paragraph{Inversión para obtener la matriz modelo}
-Para obtener la pose del cubo en el espacio de coordenadas de la cámara, es necesario invertir la matriz de transformación obtenida de ARuco. Esta inversión convierte la \gls{viewmatrix} en una \gls{modelmatrix} que describe la posición y orientación del cubo:
-
-\begin{lstlisting}[language=C++]
-cv::Mat cubeModel;
-cv::invert(cubeTransform, cubeModel);
-\end{lstlisting}
-
-\paragraph{Conversión de sistemas de coordenadas}
-OpenCV utiliza un sistema de coordenadas con matrices almacenadas en orden \gls{rowmajor}, mientras que \acrshort{osg} (utilizado por Exposure Render) emplea el orden \gls{columnmajor}. Para compatibilizar ambos sistemas, se aplica una transposición a la matriz.
-\begin{lstlisting}[language=C++]
-cv::Mat cubeModelTransposed;
-cv::transpose(cubeModel, cubeModelTransposed);
-\end{lstlisting}
-Para ilustrar esta diferencia, consideremos una matriz de rotación 3×3:
-$$
-\begin{pmatrix}
-r_{00} & r_{01} & r_{02} \\
-r_{10} & r_{11} & r_{12} \\
-r_{20} & r_{21} & r_{22}
-\end{pmatrix}
-$$
-
-En el sistema \textbf{\gls{rowmajor}} (OpenCV), los elementos se almacenan en memoria fila por fila:
-$$\text{Posición en memoria: } [r_{00}, r_{01}, r_{02}, r_{10}, r_{11}, r_{12}, r_{20}, r_{21}, r_{22}]$$
-
-En el sistema \textbf{\gls{columnmajor}} (\acrshort{osg}), los elementos se almacenan columna por columna:
-$$\text{Posición en memoria: } [r_{00}, r_{10}, r_{20}, r_{01}, r_{11}, r_{21}, r_{02}, r_{12}, r_{22}]$$
-
-Esta diferencia fundamental en el orden de almacenamiento requiere una transposición de la matriz para garantizar que los elementos ocupen las posiciones correctas en memoria según las expectativas de cada sistema:
+Los detalles matemáticos completos de estas transformaciones, incluyendo el código de implementación y las ecuaciones específicas, se pueden consultar en el Apéndice~\ref{chap:detalles_implementacion}.
 
 
 

@@ -1,0 +1,109 @@
+\chapter{Detalles de Implementación}
+\label{chap:detalles_implementacion}
+
+\lettrine{E}{n} este apéndice se incluyen los detalles técnicos de implementación del sistema de tracking, incluyendo el código fuente completo de las funciones principales y los algoritmos de transformación de coordenadas.
+
+\section{Implementación del algoritmo de tracking}
+
+\subsection{Función moveAxis}
+La función \texttt{moveAxis} permite desplazar la pose del marcador a lo largo de un eje específico del sistema de coordenadas del cubo:
+
+\begin{lstlisting}[language=C++]
+cv::Vec3d moveAxis(cv::Vec3d tvec, cv::Vec3d rvec, double distance, int axis)
+{
+    cv::Mat rotationMatrix;
+    cv::Mat rotationMatrixTransposed;
+    Rodrigues(rvec, rotationMatrix);
+    rotationMatrixTransposed = rotationMatrix.t();
+    double* rz = rotationMatrixTransposed.ptr<double>(axis); // x=0, y=1, z=2
+    tvec[0] -= rz[0] * distance;
+    tvec[1] -= rz[1] * distance;
+    tvec[2] -= rz[2] * distance;
+    return tvec;
+}
+\end{lstlisting}
+
+\subsection{Aplicación de las transformaciones al centro del cubo}
+El siguiente código muestra cómo se aplican las transformaciones para mover la pose desde la esquina del marcador hasta el centro del cubo:
+
+\begin{lstlisting}[language=C++]
+tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH, 0);
+tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH, 1);
+tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH, 2);
+\end{lstlisting}
+
+\subsection{Función cubeCoordinates}
+La función \texttt{cubeCoordinates} aplica las rotaciones necesarias según la cara detectada, usando la cara 0 como referencia:
+
+\begin{lstlisting}[language=C++]
+void cubeCoordinates(int id, cv::Vec3d& rvecs, cv::Vec3d& tvecs, float sideLength)
+{
+    tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH, 0);
+    tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH, 1);
+    tvecs = moveAxis(tvecs, rvecs, -SIDELENGTH, 2);
+    switch (id)
+    {
+    case 1://cara 1
+        rvecs = rotateXAxis(rvecs, -M_PI / 2);
+        break;
+    case 2://cara 2
+        rvecs = rotateXAxis(rvecs, M_PI);
+        break;
+    case 3://cara 3
+        rvecs = rotateYAxis(rvecs, M_PI / 2);
+        rvecs = rotateZAxis(rvecs, M_PI);
+        break;
+    case 4://cara 4
+        rvecs = rotateXAxis(rvecs, M_PI);
+        rvecs = rotateYAxis(rvecs, -M_PI / 2);
+        break;
+    case 5://cara 5
+        rvecs = rotateXAxis(rvecs, M_PI / 2);
+        break;
+    default://La cara 0 no precisa rotar
+        break;
+    }
+}
+\end{lstlisting}
+
+\section{Transformaciones de coordenadas entre sistemas}
+
+\subsection{Conversión del espacio de cámara al espacio del cubo}
+ARuco proporciona la pose del marcador como vectores de rotación y traslación que se convierten en una matriz de transformación 4×4:
+
+\begin{lstlisting}[language=C++]
+cv::Mat cubeTransform = buildTransformation(rvecFinal, tvecFinal);
+\end{lstlisting}
+
+\subsection{Inversión para obtener la matriz modelo}
+Para obtener la pose del cubo en el espacio de coordenadas de la cámara:
+
+\begin{lstlisting}[language=C++]
+cv::Mat cubeModel;
+cv::invert(cubeTransform, cubeModel);
+\end{lstlisting}
+
+\subsection{Conversión entre sistemas row-major y column-major}
+Para compatibilizar OpenCV (row-major) con OSG (column-major):
+
+\begin{lstlisting}[language=C++]
+cv::Mat cubeModelTransposed;
+cv::transpose(cubeModel, cubeModelTransposed);
+\end{lstlisting}
+
+\section{Interfaz principal de tracking}
+
+\subsection{Función getCubePoseMatrix}
+La función principal que proporciona la pose del cubo marcador:
+
+\begin{lstlisting}[language=C++]
+PoseMatrix4x4 getCubePoseMatrix(
+    bool showVisualization,
+    double markerSideLength,
+    double markerGapLength,
+    const std::string& calibrationFilePath,
+    const std::string& boardDirPath,
+    ImageData& undistortedImage);
+\end{lstlisting}
+
+Esta función encapsula toda la funcionalidad de tracking y actúa como interfaz principal entre el sistema de seguimiento y la aplicación de realidad aumentada.
