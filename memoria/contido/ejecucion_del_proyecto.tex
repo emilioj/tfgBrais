@@ -310,9 +310,138 @@ El diagrama muestra claramente las etapas principales del proceso implementado:
 \end{figure}
 
 \section{Implementación del Passthrough en Exposure Render}
-Para la obtención de imágenes sobre las que poder trabajar se utilizaron las propias cámaras frontales del HTC Vive Pro 2. Se trata de un par de cámaras colocadas longitudinalmente a lo largo del frontal del casco, que permiten su uso en aplicaciones de realidad aumentada y realidad mixta.
-Para acceder a estas cámaras se debe hacer uso de SRworks C++ SDK.
+\subsection{Captura de imagen}
+En un primer momento para la obtención de imágenes sobre las que poder realizar el seguimiento del marcador fiduciario se pretendían usar las propias cámaras frontales del HTC Vive Pro 2. Se trata de un par de cámaras colocadas longitudinalmente a lo largo del frontal del casco, que permiten su uso en aplicaciones de realidad aumentada y realidad mixta.
+Se trato de acceder a las mismas mediante el uso de SRworks C++ SDK y con librerías de terceros a pesar de no tener éxito. Posteriormente tras conversaciones con el equipo de sorporte se concluyó que no era posible el acceso a las cámaras de forma nativa. Solo a través de Android o Unity en su defecto, lo que nos hizo descartar esta posibilidad.
+La alternativa era acceder a las imágenes a través de una cámara de terceros. Esta opción presentaba la desventaja de imposibilitar el tratamiento de la imagen directamente en GPU, pero era la única viable.
 
-Este software en el momento del desarrollo del trabajo, en su versión nativa, presentaba errores que imposibilitaron la reconstrucción de la imagen para ser visualizada en el casco.
-\section{Integración del software de tracking en Exposure Render}
-Durante la integración, se procuró mantener al mínimo la latencia introducida al analizar cada imagen. Por ello se implementó la solución como un thread. Este thread está sincronizado con la tasa de refresco de las cámaras; de forma que en cuanto una nueva imagen es recibida, se procesa, se devuelven los datos de seguimiento pertinentes, y esperan a la siguiente imagen.
+\subsection{Integración del seguimiento}
+Con el fin de no aumentar la cantidad de dependencias de un proyecto de la envergadura de Exposure Render, se trató de implementar la solución de tracking como una librería independiente que se pudiera integrar en el proyecto.
+
+La integración del sistema de tracking ARuco en Exposure Render se realizó como una librería independiente que proporciona la funcionalidad de seguimiento de marcadores fiduciarios. El punto central de esta integración es la función \texttt{getCubePoseMatrix}, que actúa como interfaz principal entre el sistema de tracking y la aplicación de realidad aumentada.
+
+\subsubsection{Función getCubePoseMatrix}
+La función \texttt{getCubePoseMatrix} es la interfaz principal que proporciona la pose del cubo marcador en el espacio tridimensional:
+
+\begin{lstlisting}[language=C++]
+PoseMatrix4x4 getCubePoseMatrix(
+    bool showVisualization,
+    double markerSideLength,
+    double markerGapLength,
+    const std::string& calibrationFilePath,
+    const std::string& boardDirPath,
+    ImageData& undistortedImage);
+\end{lstlisting}
+
+Los parámetros de esta función tienen los siguientes propósitos:
+
+\begin{itemize}
+    \item \textbf{showVisualization}: Activa o desactiva la visualización en tiempo real del tracking para fines de depuración y validación.
+    \item \textbf{markerSideLength}: Especifica la longitud física del lado de cada marcador individual en metros, necesaria para calcular la escala correcta.
+    \item \textbf{markerGapLength}: Define la separación física entre marcadores en la superficie del cubo, utilizada para determinar las dimensiones reales del objeto.
+    \item \textbf{calibrationFilePath}: Ruta al archivo de calibración de la cámara que contiene los parámetros intrínsecos y de distorsión.
+    \item \textbf{boardDirPath}: Directorio que contiene las definiciones de las tablas de marcadores para cada cara del cubo.
+    \item \textbf{undistortedImage}: Referencia de salida que contiene la imagen procesada y corregida para su uso en visualización.
+\end{itemize}
+
+\subsubsection{Implementación como hilo independiente}
+Para minimizar la latencia y mantener la fluidez del renderizado principal, el sistema de tracking se implementó como un hilo independiente mediante la clase \texttt{Tracking} que encapsula toda la funcionalidad de seguimiento.
+
+El flujo de ejecución del tracking opera en un hilo separado (\texttt{poseThread}) que ejecuta continuamente el siguiente proceso:
+
+\begin{enumerate}
+    \item \textbf{Captura de pose del headset}: Obtiene la matriz de transformación actual del casco VR desde el sistema OpenXR.
+    \item \textbf{Captura de imagen}: Adquiere una nueva imagen desde la cámara del sistema.
+    \item \textbf{Procesamiento de marcadores}: Ejecuta la detección y seguimiento de marcadores ARuco llamando a \texttt{getCubePoseMatrix}.
+    \item \textbf{Sincronización de datos}: Actualiza de forma thread-safe la pose más reciente del cubo y la imagen procesada.
+    \item \textbf{Actualización del overlay}: Envía la imagen procesada al sistema de overlay para visualización en realidad aumentada.
+\end{enumerate}
+
+La gestión de concurrencia utiliza mecanismos de sincronización para garantizar la integridad de los datos compartidos:
+\begin{itemize}
+    \item \textbf{std::mutex}: Protege el acceso a las variables \texttt{\_latestPose} y \texttt{\_latestCameraImage}.
+    \item \textbf{std::atomic<bool>}: Controla el estado de ejecución del hilo mediante \texttt{\_poseThreadRunning}.
+    \item \textbf{Lock guards}: Garantizan el acceso exclusivo durante las operaciones de lectura y escritura de datos compartidos.
+\end{itemize}
+
+Esta arquitectura asegura que el hilo principal de renderizado no se vea bloqueado por las operaciones de procesamiento de imagen, manteniendo una alta tasa de refresco en la experiencia de realidad aumentada mientras proporciona datos de tracking actualizados de forma continua.
+
+\subsubsection{Estructura de datos PoseMatrix4x4 y transformaciones de coordenadas}
+
+Para facilitar la integración con Exposure Render, la librería de tracking utiliza la estructura \texttt{PoseMatrix4x4}, que representa una matriz de 4×4. Esta estructura encapsula tanto la rotación como la traslación del marcador en el espacio 3D.
+
+La función \texttt{getCubePoseMatrix} implementa una serie de transformaciones para que la pose del cubo detectada por ARuco sea directamente utilizable por el motor de renderizado de Exposure Render. El proceso de transformación se desarrolla en las siguientes etapas:
+
+\paragraph{Transformación del espacio de cámara al espacio del cubo}
+ARuco proporciona la pose del marcador como vectores de rotación y traslación (\texttt{rvec}, \texttt{tvec}) que representan la transformación del sistema de coordenadas del objeto al sistema de coordenadas de la cámara. Estos vectores se convierten en una matriz de transformación 4×4 usando la fórmula de Rodrigues para la rotación:
+
+\begin{lstlisting}[language=C++]
+cv::Mat cubeTransform = buildTransformation(rvecFinal, tvecFinal);
+\end{lstlisting}
+
+Esta matriz representa la transformación \gls{viewmatrix} del cubo respecto a la cámara.
+
+\paragraph{Inversión para obtener la matriz modelo}
+Para obtener la pose del cubo en el espacio de coordenadas de la cámara, es necesario invertir la matriz de transformación obtenida de ARuco. Esta inversión convierte la \gls{viewmatrix} en una \gls{modelmatrix} que describe la posición y orientación del cubo:
+
+\begin{lstlisting}[language=C++]
+cv::Mat cubeModel;
+cv::invert(cubeTransform, cubeModel);
+\end{lstlisting}
+
+\paragraph{Conversión de sistemas de coordenadas}
+OpenCV utiliza un sistema de coordenadas con matrices almacenadas en orden \gls{rowmajor}, mientras que \acrshort{osg} (utilizado por Exposure Render) emplea el orden \gls{columnmajor}. Para compatibilizar ambos sistemas, se aplica una transposición a la matriz.
+\begin{lstlisting}[language=C++]
+cv::Mat cubeModelTransposed;
+cv::transpose(cubeModel, cubeModelTransposed);
+\end{lstlisting}
+Para ilustrar esta diferencia, consideremos una matriz de rotación 3×3:
+$$
+\begin{pmatrix}
+r_{00} & r_{01} & r_{02} \\
+r_{10} & r_{11} & r_{12} \\
+r_{20} & r_{21} & r_{22}
+\end{pmatrix}
+$$
+
+En el sistema \textbf{\gls{rowmajor}} (OpenCV), los elementos se almacenan en memoria fila por fila:
+$$\text{Posición en memoria: } [r_{00}, r_{01}, r_{02}, r_{10}, r_{11}, r_{12}, r_{20}, r_{21}, r_{22}]$$
+
+En el sistema \textbf{\gls{columnmajor}} (\acrshort{osg}), los elementos se almacenan columna por columna:
+$$\text{Posición en memoria: } [r_{00}, r_{10}, r_{20}, r_{01}, r_{11}, r_{21}, r_{02}, r_{12}, r_{22}]$$
+
+Esta diferencia fundamental en el orden de almacenamiento requiere una transposición de la matriz para garantizar que los elementos ocupen las posiciones correctas en memoria según las expectativas de cada sistema:
+
+
+
+
+\paragraph{Transformación al \gls{worldmatrix}}
+Finalmente, la pose del cubo se transforma desde el espacio de coordenadas de la cámara al \gls{worldmatrix} del entorno VR. Esto se logra multiplicando la pose del cubo por la matriz de transformación inversa del headset VR, que se obtiene del sistema OpenXR:
+
+\begin{lstlisting}[language=C++]
+cv::Mat headsetMat = poseMatrixToCvMat(headsetPose);
+finalTransform = headsetMat * cubeModelTransposed;
+\end{lstlisting}
+
+La transformación completa se puede expresar matemáticamente como una cadena de operaciones matriciales:
+
+$$\mathbf{M}_{world} = \mathbf{H}^{-1} \cdot (\mathbf{T}_{ARuco}^{-1})^T$$
+
+Donde:
+\begin{itemize}
+    \item $\mathbf{M}_{world}$: Matriz final de transformación del cubo en coordenadas mundiales
+    \item $\mathbf{H}^{-1}$: Matriz inversa de transformación del headset VR (obtenida de OpenXR)
+    \item $\mathbf{T}_{ARuco}$: Matriz de transformación del cubo detectada por ARuco
+    \item $(\mathbf{T}_{ARuco}^{-1})^T$: Matriz transpuesta de la inversa de $\mathbf{T}_{ARuco}$
+\end{itemize}
+
+Esta fórmula unifica todos los pasos de transformación en una sola expresión matemática que convierte la \gls{pose} detectada por ARuco en una \gls{worldmatrix} compatible con Exposure Render.
+
+Este enfoque permite que el objeto virtual renderizado por Exposure Render se mantenga perfectamente alineado con el marcador físico en el mundo real, independientemente de los movimientos del usuario y la cámara. La cadena completa de transformaciones asegura que las convenciones de coordenadas de ARuco, OpenCV, \acrshort{osg} y OpenXR sean compatibles entre sí, proporcionando una experiencia de realidad aumentada coherente y precisa.
+
+\subsection{Consideraciones de implementación alternativa}
+
+Durante el desarrollo del proyecto, surgieron limitaciones técnicas en la integración completa con Exposure Render que condujeron a la exploración de enfoques alternativos de visualización. Estas limitaciones incluyeron incompatibilidades organizativas en cuanto al acceso al \acrshort{hmd} y complejidades en la transformación entre los sistemas de \gls{tracking} y renderizado, entre otros.
+
+Como resultado de estas consideraciones técnicas, se desarrolló una implementación de renderizado independiente que permitió validar la funcionalidad del sistema de seguimiento de marcadores y demostrar la viabilidad del enfoque propuesto. Esta solución alternativa mantuvo los principios fundamentales de seguimiento en tiempo real, proporcionando una base sólida para futuras integraciones con sistemas de renderizado más complejos.
+

@@ -70,6 +70,12 @@ Esta arquitectura permite el desarrollo multiplataforma con mayor simplicidad, p
 
 \subsection{OpenCV}
 \acrfull{opencv} es una librería de código abierto que implementa principalmente funciones de visión artificial en tiempo real. Se utilizó para la generación y el seguimiento de los marcadores ARuco que forma parte de los paquetes adicionales de la librería.
+
+\subsection{OpenSceneGraph}
+\acrfull{osg} es una librería gráfica 3D de código abierto escrita en C++ que encapsula la funcionalidad de OpenGL mediante una arquitectura basada en grafos de escena. Esta estructura permite organizar eficientemente objetos 3D, transformaciones y materiales en aplicaciones de renderizado en tiempo real.
+
+En este proyecto, \acrshort{osg} es utilizado por Exposure Render como motor de renderizado para la visualización de volúmenes médicos en entornos de realidad virtual.
+
 \subsection{ARuco}
 Los últimos años, los desarrollos de nuevos marcadores han tendido a un cuadrado negro con distintos patrones interiores, como en el ejemplo de la \figurename~\ref{fig:qrtags}, ya que permiten extraer la pose de la cámara a partir de sus 4 esquinas, asumiendo que esta esté adecuadamente calibrada \cite{GarridoJurado2014}. Esencialmente estos marcadores comparten ciertas características comunes en cuanto a su funcionamiento, entre todas las opciones disponibles se escogió ArUco como solución a nuestro proyecto por varios motivos:
 \begin{itemize}
@@ -170,6 +176,9 @@ Las coordenadas se definen de la siquiente forma: Z crece frente a la camara mie
 Se utilizaron dos impresoras 3D a lo largo del proyecto puesto que eran necesarios distintos requisitos para cada pieza.
 Los modelos anatómicos debido a su complejidad se imprimieron en una impresora Fuse 1+ 30W que utiliza polvo de nylon para llevar a cabo las piezas.
 Para los marcadores fiduciarios, se utilizo la Ultimaker 3, ya que se trata de figuras mas simples en las que la posibilidad de imprimir en distintos colores era especialmente importante.
+\subsection{Cámara Web}
+\subsubsection{Logitech Brio 500}
+La Logitech Brio 500 es una cámara web de alta calidad que ofrece grabación en HD a 60 fps. Esta cámara fue utilizada para la captura de imágenes y video en el desarrollo del sistema de realidad aumentada, proporcionando la entrada visual necesaria para el seguimiento de marcadores ARuco y la calibración del sistema.
 \subsection{\acrfull{hmd}}
 Para la implementación del sistema de captación de imagen y tracking se utilizó un casco HTC Vive Pro 2.
 
