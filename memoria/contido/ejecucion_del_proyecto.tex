@@ -1,11 +1,10 @@
 \chapter{Ejecución del proyecto}
 \label{chap:edp}
 Este capítulo tiene como objetivo tratar el desarrollo del proyecto en sí mismo, así como discutir las opciones disponibles durante el progreso y las decisiones tomadas para llevarlo a cabo.
-%\section{Consideraciones previas}
-%Este trabajo nace como un desarrollo del proyecto troncal de \citeauthor{IglesiasGuitian2022} y como tal se debe ceñir a las condiciones que acarrea dicho proyecto.
-%Todo el equipo utilizado durante el desarrollo fue provisto por parte del mismo, o en su defecto por parte del \acrfull{citic}.
-%\section{Dificultades}
-%Dada la naturaleza del trabajo (altamente dependiente del hardware para su ejecución), es necesaria la presencialidad a lo largo de gran parte del desarrollo. Por causa mayor me he visto obligado a desplazarme al otro extremo de la península, lo que ha condicionado en parte el final del proyecto.
+
+\section{Consideraciones previas}
+Este trabajo nace como un desarrollo del proyecto troncal de \citeauthor{IglesiasGuitian2022} y como tal se debe ceñir a las condiciones que acarrea dicho proyecto. Todo el equipo utilizado durante el desarrollo fue provisto por parte del mismo, o en su defecto por parte del \acrfull{citic}.
+
 \section{Análisis}
 Se llevó a cabo un estudio para definir la hoja de ruta del proyecto. Dada la problemática a solventar, este trabajo alcanza a tocar áreas bien diferenciadas entre si que se pueden destacar como los pasos a seguir del mismo:
 \begin{itemize}
@@ -63,22 +62,6 @@ Se utilizo principalmente la herramienta de ``Thresholding'' que permite selecci
 	\end{minipage}
 	\caption{\acrshort{tc} de partida y obtención del modelo 3D final con 3DSlicer.}
 \end{figure}
-
-% \begin{figure}%
-%     \centering
-%     \subfloat[\centering Captura de pantalla de 3DSlicer antes de cargar los datos.]{{\includegraphics[width=6cm]{imaxes/captura3dslicer_1.png} }}%
-%     \qquad
-%     \subfloat[\centering  Captura de pantalla de 3DSlicer con los datos cargados.]{{\includegraphics[width=6cm]{imaxes/captura3dslicer_2.png} }}%
-%     \caption{Capturas de 3DSlicer}%
-%     \label{fig:3dslier}%
-% \end{figure}
-
-% \begin{figure}[hp!]
-%   \centering
-%   \includegraphics[width=0.75\textwidth]{imaxes/segment_craneo.png}
-%   \caption{Torso una vez aplicado el thresholding.}
-%   \label{fig:seg_cr}
-% \end{figure}
 
 \section{Impresión 3D del volumen}
 Durante el proceso de segmentación y exportación del modelo, pueden surgir inconsistencias geométricas debido a que el modelo se genera directamente de los datos volumétricos del TC, en lugar de construirse a partir de primitivas geométricas predefinidas. Estas irregularidades, que incluyen superficies no continuas o vértices mal conectados, impedirían un correcto proceso de Slicing y, por consiguiente, la generación adecuada del archivo GCODE necesario para la impresión 3D. Para solucionar este problema, se utilizó el software Meshmixer, una herramienta especializada en la reparación y optimización de mallas 3D. Como se muestra en la \figurename~\ref{fig:arr_geo}, el modelo exportado presenta varios puntos problemáticos, señalados por marcadores, que corresponden a errores geométricos derivados del proceso de exportación. Una vez corregidos estos defectos mediante las herramientas de reparación de Meshmixer, el modelo quedó preparado para su impresión.
@@ -444,4 +427,121 @@ Este enfoque permite que el objeto virtual renderizado por Exposure Render se ma
 Durante el desarrollo del proyecto, surgieron limitaciones técnicas en la integración completa con Exposure Render que condujeron a la exploración de enfoques alternativos de visualización. Estas limitaciones incluyeron incompatibilidades organizativas en cuanto al acceso al \acrshort{hmd} y complejidades en la transformación entre los sistemas de \gls{tracking} y renderizado, entre otros.
 
 Como resultado de estas consideraciones técnicas, se desarrolló una implementación de renderizado independiente que permitió validar la funcionalidad del sistema de seguimiento de marcadores y demostrar la viabilidad del enfoque propuesto. Esta solución alternativa mantuvo los principios fundamentales de seguimiento en tiempo real, proporcionando una base sólida para futuras integraciones con sistemas de renderizado más complejos.
+
+\section{Aplicación Independiente de Realidad Aumentada}
+\label{sec:aplicacion_independiente}
+
+Con el fin de demostrar la viabilidad del sistema de \gls{tracking} desarrollado y proporcionar una herramienta práctica para la visualización de modelos anatómicos sobre marcadores fiduciarios, se implementó una aplicación independiente de realidad aumentada. Esta aplicación combina las capacidades de seguimiento ARuco desarrolladas anteriormente con un sistema de renderizado 3D que permite cargar y visualizar modelos anatómicos de diversas fuentes.
+
+\subsection{Arquitectura de la aplicación}
+
+La aplicación se estructura en varios módulos funcionales que operan de manera coordinada:
+
+\begin{itemize}
+    \item \textbf{Módulo de captura}: Gestiona la adquisición de imágenes desde la cámara web y la inicialización de los parámetros de calibración.
+    \item \textbf{Módulo de tracking}: Utiliza la librería de seguimiento ARuco desarrollada para detectar y seguir el marcador cúbico en tiempo real.
+    \item \textbf{Módulo de renderizado}: Implementa el sistema de visualización 3D utilizando \acrshort{glfw}, \acrshort{glew} y \acrshort{glm} para el renderizado con OpenGL.
+    \item \textbf{Módulo de carga de modelos}: Integra \acrshort{assimp} para soportar múltiples formatos de archivo 3D (FBX, OBJ, STL, etc.).
+\end{itemize}
+
+El punto de entrada principal de la aplicación coordina la ejecución de todos los módulos mediante hilos independientes para garantizar un rendimiento óptimo.
+
+\subsection{Sistema de renderizado basado en OpenGL}
+
+El sistema de renderizado implementado utiliza OpenGL con shaders programables para proporcionar capacidades de visualización 3D avanzadas.
+
+El renderizador OpenGL proporciona las siguientes características:
+
+\begin{itemize}
+    \item \textbf{Iluminación realista}: Implementa un \gls{phong} con componentes ambiente, difusa y especular.
+    \item \textbf{Soporte para texturas}: Permite aplicar texturas a los modelos cuando están disponibles en el archivo del modelo.
+    \item \textbf{Renderizado fuera de pantalla}: Utiliza framebuffers para renderizar la escena en una textura que posteriormente se compone con la imagen de la cámara.
+    \item \textbf{Compatibilidad con múltiples formatos}: Mediante \acrshort{assimp}, soporta formatos como FBX, OBJ, 3DS, COLLADA, etc.
+\end{itemize}
+
+El pipeline de renderizado se basa en dos tipos de shaders principales que operan en diferentes etapas del proceso de renderizado:
+
+\subsubsection{Vertex Shader}
+El vertex shader se encarga de procesar cada vértice individual del modelo 3D. Su función principal es transformar las coordenadas de los vértices desde el espacio del modelo al espacio de pantalla mediante la aplicación de las matrices de transformación (modelo, vista y proyección). Además, prepara la información necesaria para el fragment shader, incluyendo las posiciones transformadas en el espacio mundial, las normales corregidas para la iluminación y las coordenadas de textura.
+
+\subsubsection{Fragment Shader}
+El fragment shader opera sobre cada píxel de las superficies renderizadas e implementa el \gls{phong} para calcular la iluminación final. Este shader combina tres componentes de iluminación: la luz ambiente (que proporciona una iluminación base uniforme), la luz difusa (que simula la reflexión lamberiana dependiente del ángulo de incidencia) y la luz especular (que genera los brillos característicos de las superficies). El resultado final se combina con las texturas del modelo cuando están disponibles, proporcionando un renderizado visualmente realista.
+
+\subsection{Sistema de carga de modelos}
+
+La aplicación implementa un sistema de carga de modelos basado en la librería \acrshort{assimp}, que permite trabajar con múltiples formatos de archivo 3D de manera unificada. El sistema aprovecha las capacidades de \acrshort{assimp} para procesar automáticamente la geometría del modelo y convertirla en estructuras de datos optimizadas para el renderizado en tiempo real.
+
+El proceso de carga se estructura en tres etapas principales. En primer lugar, se inicializa el importador de \acrshort{assimp} con flags de post-procesamiento específicos que garantizan la compatibilidad con el pipeline de renderizado:
+
+\begin{lstlisting}[language=C++]
+Assimp::Importer importer;
+const aiScene* scene = importer.ReadFile(filename, 
+    aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_FlipUVs);
+\end{lstlisting}
+
+Estos flags aseguran que todos los polígonos del modelo estén triangulados, que las normales se generen automáticamente si no están presentes en el archivo original, y que las coordenadas de textura estén orientadas correctamente para el sistema de coordenadas de OpenGL.
+
+En la segunda etapa, se valida la estructura del archivo cargado y se extrae la primera malla disponible en la escena. \acrshort{assimp} organiza los modelos en una jerarquía de nodos que pueden contener múltiples mallas, pero para simplificar la implementación se procesa únicamente la primera malla encontrada.
+
+Finalmente, se iteran los vértices de la malla para extraer las posiciones, normales y coordenadas de textura, almacenándolas en vectores que posteriormente serán transferidos a la GPU:
+
+\begin{lstlisting}[language=C++]
+for (unsigned int i = 0; i < ai_mesh->mNumVertices; ++i) {
+    mesh.vertices.push_back(ai_mesh->mVertices[i]);
+    mesh.normals.push_back(ai_mesh->mNormals[i]);
+    mesh.texCoords.push_back(ai_mesh->mTextureCoords[0][i]);
+}
+\end{lstlisting}
+
+Este enfoque permite cargar modelos anatómicos complejos procedentes de software de segmentación médica como 3D Slicer, así como modelos creados en aplicaciones de modelado 3D estándar, proporcionando flexibilidad en las fuentes de datos sin comprometer el rendimiento del sistema de renderizado.
+
+\subsection{Flujo de ejecución de la aplicación}
+
+El flujo principal de la aplicación coordina todos los componentes del sistema:
+
+\begin{enumerate}
+    \item \textbf{Inicialización de rutas}: Se establecen las rutas a los archivos de calibración, marcadores y modelos 3D.
+    \item \textbf{Creación del hilo de captura}: Se inicia un hilo independiente para el \gls{tracking} de marcadores mediante \texttt{captureThreadFunc}.
+    \item \textbf{Inicialización del renderizador}: Se crea e inicializa el sistema de renderizado (OpenGL o OpenCV según la configuración).
+    \item \textbf{Bucle principal de renderizado}: Se ejecuta el bucle principal que combina las imágenes de la cámara con los modelos 3D renderizados.
+\end{enumerate}
+
+\begin{lstlisting}[language=C++]
+int main()
+{
+    // Configuración de parámetros del proyecto
+    std::string calibrationPath = getCalibrationPath();
+    std::string markersPath = getMarkersPath();
+    std::string modelsPath = getModelsPath();
+    
+    // Inicialización del hilo de tracking
+    std::thread captureThread(captureThreadFunc, 
+        true,  // showVisualization
+        markerSideLength, 
+        markerGapLength,
+        calibrationPath,
+        markersPath);
+    
+    // Inicialización del renderizador
+    if (!initializeRenderer(cameraResolution, modelsPath)) {
+        std::cerr << "Error: Failed to initialize renderer" << std::endl;
+        return -1;
+    }
+    
+    // Bucle principal de renderizado
+    while (!shouldClose()) {
+        Mat renderedFrame = renderFrame(pose, cameraImage);
+        
+        if (!renderedFrame.empty()) {
+            displayFrame(renderedFrame);
+        }
+        
+        processEvents();
+    }
+    
+    return 0;
+}
+\end{lstlisting}
+
+Esta arquitectura modular permite que la aplicación funcione como una herramienta independiente y versátil para la visualización de modelos 3D en realidad aumentada. El diseño implementado demuestra la efectividad del sistema de \gls{tracking} desarrollado y proporciona una base sólida para futuras extensiones y mejoras. La separación en módulos independientes facilita la integración con otros sistemas de renderizado y permite adaptar la solución a diferentes casos de uso manteniendo la robustez del seguimiento de marcadores.
 

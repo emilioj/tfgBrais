@@ -76,6 +76,18 @@ Esta arquitectura permite el desarrollo multiplataforma con mayor simplicidad, p
 
 En este proyecto, \acrshort{osg} es utilizado por Exposure Render como motor de renderizado para la visualización de volúmenes médicos en entornos de realidad virtual.
 
+\subsection{Assimp}
+\acrfull{assimp} es una librería portátil de código abierto diseñada para importar múltiples formatos de modelos 3D. La librería soporta decenas formatos de archivo diferentes incluyendo FBX, OBJ, 3DS, DAE entre otros. En este proyecto se utiliza para cargar modelos 3D anatómicos generados a partir de imágenes de \acrshort{tc}, proporcionando una interfaz consistente para acceder a geometrías, texturas y materiales independientemente del formato de archivo original.
+
+\subsection{GLFW}
+\acrfull{glfw} es una librería multiplataforma de código abierto para desarrollo de aplicaciones OpenGL, OpenGL ES y Vulkan. Proporciona una \acrshort{api} simple para crear ventanas, contextos y superficies, recibir entradas y eventos. En este proyecto se utiliza para la gestión de ventanas de renderizado y la creación de contextos OpenGL necesarios para la visualización de modelos 3D en tiempo real.
+
+\subsection{GLEW}
+\acrfull{glew} es una librería multiplataforma de código abierto que ayuda en la consulta y carga de extensiones OpenGL. GLEW proporciona mecanismos para determinar qué extensiones OpenGL están soportadas en la plataforma objetivo, simplificando el uso de OpenGL. En este proyecto se utiliza para acceder a características de OpenGL necesarias para el renderizado de modelos 3D con shaders programables.
+
+\subsection{GLM}
+\acrfull{glm} es una librería de matemáticas C++ diseñada específicamente para gráficos por computador basada en las especificaciones OpenGL Shading Language (GLSL). Proporciona clases y funciones para operaciones con vectores, matrices y transformaciones 3D. En este proyecto se utiliza para realizar cálculos de transformaciones geométricas, proyecciones de cámara y manipulación de matrices necesarias para el correcto posicionamiento de modelos 3D en el espacio de realidad aumentada.
+
 \subsection{ARuco}
 Los últimos años, los desarrollos de nuevos marcadores han tendido a un cuadrado negro con distintos patrones interiores, como en el ejemplo de la \figurename~\ref{fig:qrtags}, ya que permiten extraer la pose de la cámara a partir de sus 4 esquinas, asumiendo que esta esté adecuadamente calibrada \cite{GarridoJurado2014}. Esencialmente estos marcadores comparten ciertas características comunes en cuanto a su funcionamiento, entre todas las opciones disponibles se escogió ArUco como solución a nuestro proyecto por varios motivos:
 \begin{itemize}
