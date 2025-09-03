@@ -3,15 +3,15 @@
 En este capítulo se explican las herramientas y librerías utilizadas para llevar a cabo el proyecto.
 \section{Lenguajes de programación}
     \subsection{C++}    
-El proyecto se desarrollo en su totalidad en C++. Esto se debe a que como se menciona previamente, este trabajo forma parte del esfuerzo académico de \citeauthor{IglesiasGuitian2022} y por coherencia se decidió seguir la línea de trabajo.
-C++ es un lenguaje de programación que se beneficia de programación orientada a objetos sobre la sintaxis de C y ha utilizado para implementar librerías gráficas intrínsecas en el proyecto.
+El proyecto se desarrolló en su totalidad en C++. Esto se debe a que, como se menciona previamente, este trabajo forma parte del esfuerzo académico de \citeauthor{IglesiasGuitian2022} y por coherencia se decidió seguir la línea de trabajo.
+C++ es un lenguaje de programación que se beneficia de programación orientada a objetos sobre la sintaxis de C y se ha utilizado para implementar librerías gráficas intrínsecas en el proyecto.
 
 \section{Sistema Operativo}
 \subsection{Windows 11}
 Windows 11 es un sistema operativo desarrollado por Microsoft. Se utilizó debido a la familiaridad del proyecto con el mismo.
 \section{Control de versiones}
     \subsection{GitLab}
-Para llevar a cabo el control de versiones se utilizó GitLab ya que el código implementado formaba parte de le proyecto previamente mencionado, y este se almacena en GitLab.
+Para llevar a cabo el control de versiones se utilizó GitLab ya que el código implementado formaba parte del proyecto previamente mencionado, y este se almacena en GitLab.
 \section{Entorno de desarrollo}
     \subsection{Visual Studio Community}
 Es el Entorno de desarrollo de C++ por excelencia en Windows.
@@ -21,10 +21,10 @@ Es el Entorno de desarrollo de C++ por excelencia en Windows.
     Los ficheros \acrshort{dicom} consisten en una cabecera con campos estandarizados y de forma libre, y un cuerpo con datos de imagen. Un objeto \acrshort{dicom} simple puede contener solamente una imagen, pero esta imagen puede tener múltiples fotogramas, permitiendo el almacenamiento de bloques de datos con varios fotogramas.
    
     \subsection{3D Slicer}
-3D Slicer es un programa de software libre diseñado para solventar los problemas mas avanzados de la computación de imagen relacionados con las aplicaciones clínicas y biométricas. Las capacidades del mismo se encuentra la  posibilidad de implementar scripts de python, segmentación de imágenes y volúmenes, la posibilidad de añadir extensiones para aumentar su funcionalidad y la interoperabilidad del estándar \acrshort{dicom} entre otras.
+3D Slicer es un programa de software libre diseñado para solventar los problemas más avanzados de la computación de imagen relacionados con las aplicaciones clínicas y biométricas. Entre las capacidades del mismo se encuentra la posibilidad de implementar scripts de Python, segmentación de imágenes y volúmenes, la posibilidad de añadir extensiones para aumentar su funcionalidad y la interoperabilidad del estándar \acrshort{dicom}, entre otras.
 
 \subsection{Meshmixer}
-Al procurar generar un modelo a partir de una nube de puntos de un TAC, es común encontrarse con que los modelos exportados en STL contienen errores y no pueden ser impresos directamente. Se probaron varias herramientas para solventar estos errores en la estructura de los modelos 3D, pero finalmente \href{https://www.meshmixer.com}{Meshmixer} resultó dar los mejores resultados a la hora de arreglar las geometrías con esta casuística can específica.
+Al procurar generar un modelo a partir de una nube de puntos de un TAC, es común encontrarse con que los modelos exportados en STL contienen errores y no pueden ser impresos directamente. Se probaron varias herramientas para solventar estos errores en la estructura de los modelos 3D, pero finalmente \href{https://www.meshmixer.com}{Meshmixer} resultó dar los mejores resultados a la hora de arreglar las geometrías con esta casuística tan específica.
     \subsection{Meshlab}
 Una alternativa de software libre para la reparación de mallas 3D es \href{https://www.meshlab.net}{Meshlab}, que ofrece herramientas similares para limpiar y corregir geometrías de modelos STL.
     \subsection{Blender}
@@ -33,17 +33,17 @@ Blender es un potente software de modelado, animación, renderizado y edición 3
 UltiMaker Cura es el programa desarrollado por UltiMaker para generar el GCODE necesario para imprimir modelos en una impresora de dicha marca. Se utilizó ya que permite importar ajustes específicos de la impresora sobre la que se trabajo de forma sencilla.
 \section{Frameworks}
 \subsection{OpenXR}
-OpenXR es una \acrfull{api} multi plataforma, que permite el desarrollo de medios en el \textit{virtual continuum} mediante ordenadores a través de interacción  humano-máquina.
-Esta \acrshort{api} es la interfaz con un runtime para llevar a cabo operaciones comunes como puede ser acceder al estado de un mando o periférico, obtener o predecir la posicion del sistema o enviar frames para ser renderizados.
+OpenXR es una \acrfull{api} multiplataforma que permite el desarrollo de medios en el \textit{virtual continuum} mediante ordenadores a través de interacción humano-máquina.
+Esta \acrshort{api} es la interfaz con un runtime para llevar a cabo operaciones comunes como puede ser acceder al estado de un mando o periférico, obtener o predecir la posición del sistema o enviar frames para ser renderizados.
 
 \subsubsection{Ciclo de Vida}
 En la \figurename~\ref{fig:openxrlifecycle} se muestra la máquina de estados de la sesión:
 \begin{enumerate}
     \item La aplicación crea una sesión escogiendo un sistema y una API gráfica. En un primer momento esta se encuentra en estado IDLE.
-    \item Se monitorea la sesion en busca de cambios de estados mediante eventos.
-    \item Cuando el runtime determina que el sistema esta listo para empezar con el contenido \acrshort{xr} de la sesion, se recibe un cambio de estado a READY.
-    \item Mientras que la sesión esta corriendo, se espera que la aplicación ejecute continuamente el frame loop, estableciendo así sincronización con el runtime, lo que provoca un cambio de estado a SYNCHRONIZED.
-    \item Una vez que el runtime este listo para mostrar frames de la aplicación, se notifica con el estado VISIBLE.
+    \item Se monitorea la sesión en busca de cambios de estados mediante eventos.
+    \item Cuando el runtime determina que el sistema está listo para empezar con el contenido \acrshort{xr} de la sesión, se recibe un cambio de estado a READY.
+    \item Mientras que la sesión está corriendo, se espera que la aplicación ejecute continuamente el frame loop, estableciendo así sincronización con el runtime, lo que provoca un cambio de estado a SYNCHRONIZED.
+    \item Una vez que el runtime esté listo para mostrar frames de la aplicación, se notifica con el estado VISIBLE.
     \item Si el runtime detecta que es posible recibir entradas desde un mando, reconocimiento facial o demás, notifica con un estado FOCUSED.
     \item Estos estados, como se ve en la \figurename~\ref{fig:openxrlifecycle}, también tienen carácter retroactivo, de forma que cuando las características dejan de estar disponibles se va cambiando de estado, hasta que se desee parar o cerrar la aplicación.
     
@@ -57,9 +57,9 @@ En la \figurename~\ref{fig:openxrlifecycle} se muestra la máquina de estados de
 \end{figure}
 
 \subsubsection{API Layers}
-OpenXR esta diseñado como una \acrshort{api} por capas, lo que quiere decir que una aplicacion puede insertar más o menos capas entre la aplicación y la implementación del runtime seleccionada. Estas capas proveen de funcionalidades adicionales interceptando las funciones de OpenXR de la capa superior, y posteriormente llevando a cabo operacione distinas a las que se llevarian a caboen caso de que no estuviese presente la capa. En el mas sencillo de los casos una capa simplemente llama a la inferior con los mismos argumentos, pero en casos mas elaborados se pueden implementar funcionalidades no disponibles en las capas o incluso runtime inferiores (\figurename~\ref{fig:openxrapilayer}).
+OpenXR está diseñado como una \acrshort{api} por capas, lo que quiere decir que una aplicación puede insertar más o menos capas entre la aplicación y la implementación del runtime seleccionada. Estas capas proveen de funcionalidades adicionales interceptando las funciones de OpenXR de la capa superior, y posteriormente llevando a cabo operaciones distintas a las que se llevarían a cabo en caso de que no estuviese presente la capa. En el más sencillo de los casos una capa simplemente llama a la inferior con los mismos argumentos, pero en casos más elaborados se pueden implementar funcionalidades no disponibles en las capas o incluso runtime inferiores (\figurename~\ref{fig:openxrapilayer}).
 
-Esta arquitectura permite el desarrollo multiplataforma con mayor simplicidad, pero es dependiente de que los vendedores implementen sus propias capas API de OpenXR, lo que limita en cierta medida las 
+Esta arquitectura permite el desarrollo multiplataforma con mayor simplicidad, pero es dependiente de que los vendedores implementen sus propias capas API de OpenXR, lo que limita en cierta medida las posibilidades de desarrollo. 
 
 \begin{figure}
   \centering
@@ -77,7 +77,7 @@ Esta arquitectura permite el desarrollo multiplataforma con mayor simplicidad, p
 En este proyecto, \acrshort{osg} es utilizado por Exposure Render como motor de renderizado para la visualización de volúmenes médicos en entornos de realidad virtual.
 
 \subsection{Assimp}
-\acrfull{assimp} es una librería portátil de código abierto diseñada para importar múltiples formatos de modelos 3D. La librería soporta decenas formatos de archivo diferentes incluyendo FBX, OBJ, 3DS, DAE entre otros. En este proyecto se utiliza para cargar modelos 3D anatómicos generados a partir de imágenes de \acrshort{tc}, proporcionando una interfaz consistente para acceder a geometrías, texturas y materiales independientemente del formato de archivo original.
+\acrfull{assimp} es una librería portátil de código abierto diseñada para importar múltiples formatos de modelos 3D. La librería soporta decenas de formatos de archivo diferentes incluyendo FBX, OBJ, 3DS, DAE, entre otros. En este proyecto se utiliza para cargar modelos 3D anatómicos generados a partir de imágenes de \acrshort{tc}, proporcionando una interfaz consistente para acceder a geometrías, texturas y materiales independientemente del formato de archivo original.
 
 \subsection{GLFW}
 \acrfull{glfw} es una librería multiplataforma de código abierto para desarrollo de aplicaciones OpenGL, OpenGL ES y Vulkan. Proporciona una \acrshort{api} simple para crear ventanas, contextos y superficies, recibir entradas y eventos. En este proyecto se utiliza para la gestión de ventanas de renderizado y la creación de contextos OpenGL necesarios para la visualización de modelos 3D en tiempo real.
@@ -143,9 +143,9 @@ Además es posible modificar los siguientes parámetros para adecuar la librerí
     \item \textbf{adaptiveThreshWinSizeMin and adaptiveThreshWinSizeMax:}
     El tamaño mínimo y máximo de la ventana utilizada para la umbralización adaptativa. La umbralización adaptativa es un método para determinar automáticamente el valor de umbral óptimo para una imagen. Estos parámetros se utilizan para especificar el tamaño de la ventana en píxeles que se utilizará para la umbralización adaptativa.
     \item \textbf{adaptiveThreshWinSizeMax:}
-    Especificaa el paso o incremento con el cual se variará el tamaño de la ventana utilizada en la umbralización adaptativa.
+    Especifica el paso o incremento con el cual se variará el tamaño de la ventana utilizada en la umbralización adaptativa.
     \item \textbf{adaptiveThreshConstant:}
-    especificar una constante que se utilizará en el cálculo del valor de umbral para cada subregión de la imagen.
+    Especifica una constante que se utilizará en el cálculo del valor de umbral para cada subregión de la imagen.
     \item \textbf{minMarkerPerimeterRate and maxMarkerPerimeterRate:}
     El porcentaje mínimo y máximo del perímetro de un marcador en relación con su área. Estos parámetros se utilizan para especificar el tamaño mínimo y máximo de los marcadores que se detectarán en la imagen.
     \item \textbf{minCornerDistanceRate:}
@@ -173,9 +173,9 @@ La primera operación consiste en determinar la cantidad de bits erróneos permi
 \subsubsection*{Refinado de Esquinas}
 Se puede realizar un refinado a nivel de subpíxel de las esquinas para mejorar la precisión del sistema. Este ultimo paso es altamente costoso a nivel computacional, pero se recomienda en aplicaciones en las que prima la precisión como es el caso.
 
-Esta librería trabaja con un Pinhole Camera Model lo que quiere decir que se considera como el origen de coordenadas el punto en el que todos los rayos de lux convergerían en una supuesta cámara estenopeica ideal.
+Esta librería trabaja con un Pinhole Camera Model lo que quiere decir que se considera como el origen de coordenadas el punto en el que todos los rayos de luz convergerían en una supuesta cámara estenopeica ideal.
 
-Las coordenadas se definen de la siquiente forma: Z crece frente a la camara mientras que X e Y se encuentran en el plano otrogonal de Z. X aumenta de derecha a izquierda e Y de abajo a arriba.
+Las coordenadas se definen de la siguiente forma: Z crece frente a la cámara mientras que X e Y se encuentran en el plano ortogonal de Z. X aumenta de derecha a izquierda e Y de abajo a arriba.
 
 
 
@@ -187,7 +187,7 @@ Las coordenadas se definen de la siquiente forma: Z crece frente a la camara mie
 \subsection{Impresión 3D}
 Se utilizaron dos impresoras 3D a lo largo del proyecto puesto que eran necesarios distintos requisitos para cada pieza.
 Los modelos anatómicos debido a su complejidad se imprimieron en una impresora Fuse 1+ 30W que utiliza polvo de nylon para llevar a cabo las piezas.
-Para los marcadores fiduciarios, se utilizo la Ultimaker 3, ya que se trata de figuras mas simples en las que la posibilidad de imprimir en distintos colores era especialmente importante.
+Para los marcadores fiduciarios, se utilizó la Ultimaker 3, ya que se trata de figuras más simples en las que la posibilidad de imprimir en distintos colores era especialmente importante.
 \subsection{Cámara Web}
 \subsubsection{Logitech Brio 500}
 La Logitech Brio 500 es una cámara web de alta calidad que ofrece grabación en HD a 60 fps. Esta cámara fue utilizada para la captura de imágenes y video en el desarrollo del sistema de realidad aumentada, proporcionando la entrada visual necesaria para el seguimiento de marcadores ARuco y la calibración del sistema.

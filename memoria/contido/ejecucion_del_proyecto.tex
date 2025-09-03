@@ -18,7 +18,7 @@ Fruto de la investigación surge el artículo de  \citeauthor{MoretaMartinez2020
 
 Uno de los principales requisitos debe ser la robustez del sistema frente a las oclusiones del marcador. Es necesario que el seguimiento sea posible a pesar de la oclusión parcial del marcador. Además, es preciso que a partir de una fuente de vídeo se puedan extraer las coordenadas del marcador, así como su rotación en el espacio. Destacar también que el seguimiento debe ocurrir en un segundo plano, entorpeciendo lo menos posible las operaciones del hilo principal de ejecución, ya que parte de estas operaciones tiene una latencia crítica.
 
-Este trabajo nace como un desarrollo del proyecto troncal de \citeauthor{IglesiasGuitian2022}, y como tal, debe ceñirse a ciertas pautas del mismo. Exposure Render cuenta con un módulo de realidad virtual, en el que se integrará la solución de tracking para lograr un control mas natural sobre el modelo a tratar, moviéndose en las imágenes renderizadas a la par que se mueve en la realidad, como se muestra en el diagrama de secuencia de la \figurename~\ref{fig:flow_exposure}.
+Este trabajo nace como un desarrollo del proyecto troncal de \citeauthor{IglesiasGuitian2022}, y como tal, debe ceñirse a ciertas pautas del mismo. Exposure Render cuenta con un módulo de realidad virtual, en el que se integrará la solución de tracking para lograr un control más natural sobre el modelo a tratar, moviéndose en las imágenes renderizadas a la par que se mueve en la realidad, como se muestra en el diagrama de secuencia de la \figurename~\ref{fig:flow_exposure}.
 
 \begin{figure}
 	\centering
@@ -29,18 +29,10 @@ Este trabajo nace como un desarrollo del proyecto troncal de \citeauthor{Iglesia
 
 \section{Generación de volúmenes a partir de TC}
 Con el fin de facilitar la validación del progreso del proyecto, se utilizó una \acrshort{tc} de pruebas. Dichos datos contienen la sección superior (hombros y cabeza) de un sujeto, mostrado en la \figurename~\ref{fig:manix_full}. Durante el desarrollo se sugirió como posible caso práctico seleccionar el cráneo del sujeto en los datos de prueba y trabajar en la alineación 3D sobre el mismo.
-%En las siguientes figuras se representa este objetivo.
 
-% \begin{figure}
-%   \centering
-%   \includegraphics[width=0.4\textwidth]{imaxes/manix_full.png}
-%   \caption{Datos de prueba.}
-%   \label{fig:manix_full}
-% \end{figure}
-
-Con el fin de seleccionar una sección concreta para exportar, se utilizaron las herramientas para segmentar volúmenes de Slicer3D.
+Con el fin de seleccionar una sección concreta para exportar, se utilizaron las herramientas para segmentar volúmenes de 3D Slicer.
 Al abrir el programa se pueden ver las vistas, en las que se representará el \acrshort{tc} una vez cargado, como se muestra en la captura de pantalla de la \figurename~\ref{fig:3dslier}.
-Se utilizo principalmente la herramienta de ``Thresholding'' que permite seleccionar partes del modelo cuyas intensidades se comprenden en un intervalo o ``threshold'' (ver \figurename~\ref{fig:seg_cr}). Posteriormente, para la eliminación de las partes del modelo no deseadas, se utilizó la herramienta de borrado hasta alcanzar el volumen deseado.
+Se utilizó principalmente la herramienta de «Thresholding» que permite seleccionar partes del modelo cuyas intensidades se comprenden en un intervalo o «threshold» (ver \figurename~\ref{fig:seg_cr}). Posteriormente, para la eliminación de las partes del modelo no deseadas, se utilizó la herramienta de borrado hasta alcanzar el volumen deseado.
 
 \begin{figure}
 	\centering
@@ -52,15 +44,15 @@ Se utilizo principalmente la herramienta de ``Thresholding'' que permite selecci
 		\begin{subfigure}{\textwidth}
 			\centering
 			\includegraphics[width=\textwidth]{imaxes/captura3dslicer_2.png}
-			\caption{ Captura de pantalla de 3DSlicer con los datos cargados.}\label{fig:3dslier}
+			\caption{ Captura de pantalla de 3D Slicer con los datos cargados.}\label{fig:3dslier}
 		\end{subfigure}\\
 		\begin{subfigure}{\textwidth}
 			\centering
 			\includegraphics[width=\textwidth]{imaxes/segment_craneo.png}
-			\caption{ Captura de pantalla de 3DSlicer del torso una vez aplicado el thresholding.}\label{fig:seg_cr}
+			\caption{ Captura de pantalla de 3D Slicer del torso una vez aplicado el thresholding.}\label{fig:seg_cr}
 		\end{subfigure}
 	\end{minipage}
-	\caption{\acrshort{tc} de partida y obtención del modelo 3D final con 3DSlicer.}
+	\caption{\acrshort{tc} de partida y obtención del modelo 3D final con 3D Slicer.}
 \end{figure}
 
 \section{Impresión 3D del volumen}
@@ -75,7 +67,7 @@ Durante el proceso de segmentación y exportación del modelo, pueden surgir inc
 
 Como se comenta en el Capítulo \ref{chap:hs}, para una pieza con una geometría tan compleja, se requeriría una gran cantidad de soportes. Debido a esto, se optó por la impresora Fuse 1 para la impresión de este modelo. A diferencia de una impresora 3D al uso, esta impresora utiliza un láser para fijar capa a capa el polvo de nylon, lo que garantiza una gran resolución en la pieza final y una gran durabilidad de la misma.
 
-Posterior al  trabajo de impresión es necesario retirar el material sobrante en la cámara de recuperación que cuenta con distintos utensilios para evitar malgastar el material sobrante ya que puede ser reutilizado.
+Posterior al proceso de impresión es necesario retirar el material sobrante en la cámara de recuperación que cuenta con distintos utensilios para evitar malgastar el material sobrante ya que puede ser reutilizado.
 
 \begin{figure}%
 	\centering
@@ -100,9 +92,9 @@ Si bien existen aproximaciones que buscan puntos claves de las figuras o reconoc
     \item \textbf{Simplicidad de implementación}: Dados los recursos disponibles, se optó por utilizar la librería ARuco para generar y seguir el marcador, aprovechando su madurez y estabilidad.
 \end{itemize}
 
-\subsection{Fundamentos teóricos del seguimiento con ARuco}
+\subsection{Fundamentos teóricos del seguimiento con ArUco}
 
-ARuco a la hora de detectar la posición de un marcador, trabaja con un modelo de coordenadas pin-hole, donde las coordenadas y rotación de los objetos detectados se expresan en función de la posición de la cámara.
+ArUco a la hora de detectar la posición de un marcador, trabaja con un modelo de coordenadas pin-hole, donde las coordenadas y rotación de los objetos detectados se expresan en función de la posición de la cámara.
 El calibrado de la cámara permite determinar la proyección de cualquier punto en las 3 dimensiones del espacio en el sensor de la cámara. En una cámara ideal, un punto 3D $(X, Y, Z)$ en el espacio se proyectaría en el píxel:
 \begin{align*}
 	x & = \frac{X \cdot fx}{Z} + cx & y = \frac{Y \cdot fy}{Z} + cy
@@ -246,13 +238,13 @@ El diagrama de flujo completo del algoritmo, desde la captura de imagen hasta la
 \section{Implementación del Passthrough en Exposure Render}
 \subsection{Captura de imagen}
 En un primer momento para la obtención de imágenes sobre las que poder realizar el seguimiento del marcador fiduciario se pretendían usar las propias cámaras frontales del HTC Vive Pro 2. Se trata de un par de cámaras colocadas longitudinalmente a lo largo del frontal del casco, que permiten su uso en aplicaciones de realidad aumentada y realidad mixta.
-Se trato de acceder a las mismas mediante el uso de SRworks C++ SDK y con librerías de terceros a pesar de no tener éxito. Posteriormente tras conversaciones con el equipo de sorporte se concluyó que no era posible el acceso a las cámaras de forma nativa. Solo a través de Android o Unity en su defecto, lo que nos hizo descartar esta posibilidad.
+Se trató de acceder a las mismas mediante el uso de SRworks C++ SDK y con librerías de terceros a pesar de no tener éxito. Posteriormente tras conversaciones con el equipo de soporte se concluyó que no era posible el acceso a las cámaras de forma nativa. Solo a través de Android o Unity en su defecto, lo que nos hizo descartar esta posibilidad.
 La alternativa era acceder a las imágenes a través de una cámara de terceros. Esta opción presentaba la desventaja de imposibilitar el tratamiento de la imagen directamente en GPU, pero era la única viable.
 
 \subsection{Integración del seguimiento}
-Con el fin de no aumentar la cantidad de dependencias de un proyecto de la envergadura de Exposure Render, se trató de implementar la solución de tracking como una librería independiente que se pudiera integrar en el proyecto.
+Con el fin de no aumentar la cantidad de dependencias de un proyecto de la envergadura de Exposure Render, se trató de implementar la solución de tracking como una librería independiente que se pudiese integrar en el proyecto.
 
-La integración del sistema de tracking ARuco en Exposure Render se realizó como una librería independiente que proporciona la funcionalidad de seguimiento de marcadores fiduciarios. El punto central de esta integración es la función \texttt{getCubePoseMatrix}, que actúa como interfaz principal entre el sistema de tracking y la aplicación de realidad aumentada.
+La integración del sistema de tracking ArUco en Exposure Render se realizó como una librería independiente que proporciona la funcionalidad de seguimiento de marcadores fiduciarios. El punto central de esta integración es la función \texttt{getCubePoseMatrix}, que actúa como interfaz principal entre el sistema de tracking y la aplicación de realidad aumentada.
 
 \subsubsection{Función getCubePoseMatrix}
 La función \texttt{getCubePoseMatrix} es la interfaz principal que proporciona la pose del cubo marcador en el espacio tridimensional. Los parámetros de esta función incluyen configuraciones para visualización, dimensiones físicas del marcador, rutas de calibración y directorios de configuración.
@@ -267,7 +259,7 @@ El flujo de ejecución del tracking opera en un hilo separado (\texttt{poseThrea
 \begin{enumerate}
     \item \textbf{Captura de pose del headset}: Obtiene la matriz de transformación actual del casco VR desde el sistema OpenXR.
     \item \textbf{Captura de imagen}: Adquiere una nueva imagen desde la cámara del sistema.
-    \item \textbf{Procesamiento de marcadores}: Ejecuta la detección y seguimiento de marcadores ARuco llamando a \texttt{getCubePoseMatrix}.
+    \item \textbf{Procesamiento de marcadores}: Ejecuta la detección y seguimiento de marcadores ArUco llamando a \texttt{getCubePoseMatrix}.
     \item \textbf{Sincronización de datos}: Actualiza de forma thread-safe la pose más reciente del cubo y la imagen procesada.
     \item \textbf{Actualización del overlay}: Envía la imagen procesada al sistema de overlay para visualización en realidad aumentada.
 \end{enumerate}
@@ -285,7 +277,7 @@ Esta arquitectura asegura que el hilo principal de renderizado no se vea bloquea
 
 Para facilitar la integración con Exposure Render, la librería de tracking utiliza la estructura \texttt{PoseMatrix4x4}, que representa una matriz de 4×4. Esta estructura encapsula tanto la rotación como la traslación del marcador en el espacio 3D.
 
-La función \texttt{getCubePoseMatrix} implementa una serie de transformaciones para que la pose del cubo detectada por ARuco sea directamente utilizable por el motor de renderizado de Exposure Render. El proceso incluye:
+La función \texttt{getCubePoseMatrix} implementa una serie de transformaciones para que la pose del cubo detectada por ArUco sea directamente utilizable por el motor de renderizado de Exposure Render. El proceso incluye:
 
 \begin{enumerate}
     \item \textbf{Transformación del espacio de cámara al espacio del cubo}: Conversión de vectores de rotación y traslación a matriz de transformación 4×4.
@@ -308,19 +300,19 @@ finalTransform = headsetMat * cubeModelTransposed;
 
 La transformación completa se puede expresar matemáticamente como una cadena de operaciones matriciales:
 
-$$\mathbf{M}_{world} = \mathbf{H}^{-1} \cdot (\mathbf{T}_{ARuco}^{-1})^T$$
+$$\mathbf{M}_{world} = \mathbf{H}^{-1} \cdot (\mathbf{T}_{ArUco}^{-1})^T$$
 
 Donde:
 \begin{itemize}
     \item $\mathbf{M}_{world}$: Matriz final de transformación del cubo en coordenadas mundiales
     \item $\mathbf{H}^{-1}$: Matriz inversa de transformación del headset VR (obtenida de OpenXR)
-    \item $\mathbf{T}_{ARuco}$: Matriz de transformación del cubo detectada por ARuco
-    \item $(\mathbf{T}_{ARuco}^{-1})^T$: Matriz transpuesta de la inversa de $\mathbf{T}_{ARuco}$
+    \item $\mathbf{T}_{ArUco}$: Matriz de transformación del cubo detectada por ArUco
+    \item $(\mathbf{T}_{ArUco}^{-1})^T$: Matriz transpuesta de la inversa de $\mathbf{T}_{ArUco}$
 \end{itemize}
 
-Esta fórmula unifica todos los pasos de transformación en una sola expresión matemática que convierte la \gls{pose} detectada por ARuco en una \gls{worldmatrix} compatible con Exposure Render.
+Esta fórmula unifica todos los pasos de transformación en una sola expresión matemática que convierte la \gls{pose} detectada por ArUco en una \gls{worldmatrix} compatible con Exposure Render.
 
-Este enfoque permite que el objeto virtual renderizado por Exposure Render se mantenga perfectamente alineado con el marcador físico en el mundo real, independientemente de los movimientos del usuario y la cámara. La cadena completa de transformaciones asegura que las convenciones de coordenadas de ARuco, OpenCV, \acrshort{osg} y OpenXR sean compatibles entre sí, proporcionando una experiencia de realidad aumentada coherente y precisa.
+Este enfoque permite que el objeto virtual renderizado por Exposure Render se mantenga perfectamente alineado con el marcador físico en el mundo real, independientemente de los movimientos del usuario y la cámara. La cadena completa de transformaciones asegura que las convenciones de coordenadas de ArUco, OpenCV, \acrshort{osg} y OpenXR sean compatibles entre sí, proporcionando una experiencia de realidad aumentada coherente y precisa.
 
 \subsection{Consideraciones de implementación alternativa}
 
@@ -339,7 +331,7 @@ La aplicación se estructura en varios módulos funcionales que operan de manera
 
 \begin{itemize}
     \item \textbf{Módulo de captura}: Gestiona la adquisición de imágenes desde la cámara web y la inicialización de los parámetros de calibración.
-    \item \textbf{Módulo de tracking}: Utiliza la librería de seguimiento ARuco desarrollada para detectar y seguir el marcador cúbico en tiempo real.
+    \item \textbf{Módulo de tracking}: Utiliza la librería de seguimiento ArUco desarrollada para detectar y seguir el marcador cúbico en tiempo real.
     \item \textbf{Módulo de renderizado}: Implementa el sistema de visualización 3D utilizando \acrshort{glfw}, \acrshort{glew} y \acrshort{glm} para el renderizado con OpenGL.
     \item \textbf{Módulo de carga de modelos}: Integra \acrshort{assimp} para soportar múltiples formatos de archivo 3D (FBX, OBJ, STL, etc.).
 \end{itemize}

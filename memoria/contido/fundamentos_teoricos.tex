@@ -1,7 +1,7 @@
 \chapter{Fundamentos Teóricos y Técnológicos}
 \label{chap:ft}
 \lettrine{E}{n} este capítulo se repasan los principios básicos sobre los que se establece este trabajo.
-\section{Tomografía Computerizada}
+\section{Tomografía Computarizada}
 
 Una \acrfull{tc}, también conocida como escáner, es una técnica de
 diagnóstico médico que utiliza rayos X, detectores y un ordenador para
@@ -60,10 +60,10 @@ Los algoritmos de reconstrucción de imágenes son métodos computacionales util
 La impresión 3D es una tecnología de fabricación aditiva que permite crear objetos tridimensionales a partir de un modelo digital. Esta tecnología ha revolucionado la forma en que se fabrican piezas y productos, ya que permite la creación de objetos complejos con geometrías que serían difíciles o imposibles de lograr con métodos de fabricación tradicionales. La impresión 3D se utiliza en una amplia variedad de aplicaciones, desde la fabricación de piezas de repuesto hasta la creación de prótesis médicas personalizadas.
 
 \paragraph{Fabricación aditiva.}
-La impresión 3D es un ejemplo de fabricación aditiva, que se refiere a manipulación y deposito de un material a escala micrométrica de forma muy precisa para construir un sólido. La fabricación aditiva es una alternativa a los métodos de fabricación tradicionales, como el fresado y el torneado, que implican la eliminación de material de una pieza bruta \cite{zahera2012fabricacion}.
+La impresión 3D es un ejemplo de fabricación aditiva, que se refiere a la manipulación y depósito de un material a escala micrométrica de forma muy precisa para construir un sólido. La fabricación aditiva es una alternativa a los métodos de fabricación tradicionales, como el fresado y el torneado, que implican la eliminación de material de una pieza bruta \cite{zahera2012fabricacion}.
 
-Esta técnica de fabricación presenta una serie de ventajas. La complejidad de la geometría de la figura no encarece la fabricación de la misma (a expensas de la necesidad de material como soporte de la geometría principal) sino que permite generar piezas con geometrías previamente inviables, o con un alto coste.
-Otra de las ventajas es la posibilidad de generar prototipos de piezas cuyas versiones finales presentan un alto coste, por un precio muy reducido, y una alta fidelidad acelerando así el proceso iterativo del diseño.
+Esta técnica de fabricación presenta una serie de ventajas. La complejidad de la geometría de la figura no encarece la fabricación de la misma (a expensas de la necesidad de material como soporte de la geometría principal), sino que permite generar piezas con geometrías previamente inviables o con un alto coste.
+Otra de las ventajas es la posibilidad de generar prototipos de piezas cuyas versiones finales presentan un alto coste, por un precio muy reducido y una alta fidelidad, acelerando así el proceso iterativo del diseño.
 
 \paragraph{Modelado.}
 El proceso de impresión 3D comienza con el modelado de la pieza o producto que se desea imprimir. Este modelo puede crearse utilizando software \acrfull{cad} o mediante la digitalización de un objeto existente utilizando un escáner 3D. En nuestro caso, el modelo tridimensional se obtiene de la reconstrucción 3D a partir de una \acrshort{tc}.
@@ -73,7 +73,7 @@ El proceso de impresión 3D comienza con el modelado de la pieza o producto que 
 En impresión 3D, el proceso de slicing (o rebanado, en español) se refiere a la preparación del modelo tridimensional, típicamente en formato STL, para su impresión en capas sucesivas. Es un paso crucial que convierte el modelo en una serie de capas planas y delgadas que la impresora 3D puede imprimir una por una.
 El \emph{slicer} permite además realizar ajustes en el modelo 3D, con el fin de obtener el resultado deseado, generando como resultado una serie de instrucciones precisas que la impresora entiende para elaborar capa a capa el volumen.
 
-\paragraph{GCODE.} Las instrucciones que se generan a partir del proceso de \emph{slicing} son provistas en forma de GCODE. El GCODE es el lenguaje utilizado para describir paso a paso que movimientos y acciones debe tomar la impresora en cada momento. Este lenguaje tiene distintas implementaciones dependiendo del fabricante del equipamiento, ya que se trata de un lenguaje utilizado en múltiples aplicaciones de control numérico.
+\paragraph{GCODE.} Las instrucciones que se generan a partir del proceso de \emph{slicing} son provistas en forma de GCODE. El GCODE es el lenguaje utilizado para describir paso a paso qué movimientos y acciones debe tomar la impresora en cada momento. Este lenguaje tiene distintas implementaciones dependiendo del fabricante del equipamiento, ya que se trata de un lenguaje utilizado en múltiples aplicaciones de control numérico.
 
 \section{Realidad Extendida}
 
@@ -83,24 +83,24 @@ En 1994, \citeauthor{Milgram1994ATO}~\cite{Milgram1994ATO} acuñan el término d
 \begin{itemize}
 	\item Entorno Real: consiste únicamente en objetos reales (extremo izquierdo de la figura).
 	\item Realidad Aumentada: mundo real aumentado o compuesto por elementos digitales.
-	\item Virtualidad Aumentada: mundo digital aumentado por objetos reales o fisicos.
+	\item Virtualidad Aumentada: mundo digital aumentado por objetos reales o físicos.
 	\item Entorno Virtual: entorno puramente virtual (extremo derecho de la figura).
 \end{itemize}
 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.6\textwidth]{imaxes/virtuality_continuum.png}
-	\caption{Representacion simplificada del concepto de \emph{virtuality continuum}.}
+	\caption{Representación simplificada del concepto de \emph{virtuality continuum}.}
 	\label{fig:vc}
 \end{figure}
 
 \paragraph{Realidad aumentada.}
-Posteriormente \citeauthor{Azuma1997}~\cite{Azuma1997} definía la \acrlong{ar} como una variación de la \acrlong{vr}, en la cual el usuario es capaz de ver el mundo real, con objetos virtuales superpuestos, o compuestos por el mundo real. La posibilidad de crear objetos y prototipos de forma rápida, sobre los cuales poder iterar y componer imágenes virtuales, demuestra el potencial de estas tecnologías inmersivas trabajando a la par. En la actualidad sus principales aplicaciones se encuentran, además de en juegos y entretenimiento, en educación, medicina, arquitecture, ingeniería e interpretación del patrimonio.
+Posteriormente \citeauthor{Azuma1997}~\cite{Azuma1997} definía la \acrlong{ar} como una variación de la \acrlong{vr}, en la cual el usuario es capaz de ver el mundo real, con objetos virtuales superpuestos, o compuestos por el mundo real. La posibilidad de crear objetos y prototipos de forma rápida, sobre los cuales poder iterar y componer imágenes virtuales, demuestra el potencial de estas tecnologías inmersivas trabajando a la par. En la actualidad sus principales aplicaciones se encuentran, además de en juegos y entretenimiento, en educación, medicina, arquitectura, ingeniería e interpretación del patrimonio.
 
 %La realidad aumentada es una tecnología que combina elementos virtuales con el mundo real, permitiendo a los usuarios interactuar con objetos y escenarios virtuales en tiempo real.
 
 \section{Visión Artificial}
 
-Se denomina visión artificial al campo que incluye los métodos necesarios para adquirir, procesar, analizar y comprender las imágenes del mundo real con el fin de producir información procesable por un ordenador. Esta fuertemente vinculado con la realidad aumentada, ya que es imprescindible para poder transmitir la información del medio al ordenador encargado de generar imágenes correspondientes.
-Entre los objetivos de la visión artificial se encuentra la capacidad de reconocer patrones dentro de una imagen o vídeo con el fin de poder extraer las características de los objetos dentro de dicho medio y  procesarlas.
-Otro objetivo es la reconstrucción 3D a partir de imágenes, que pretende generar volúmenes 3D desde las imágenes obtenidas, esto es especialmente importante en la realidad aumentada por que permite una mayor percepción de la profundidad sobre el medio generado por ordenador.
+Se denomina visión artificial al campo que incluye los métodos necesarios para adquirir, procesar, analizar y comprender las imágenes del mundo real con el fin de producir información procesable por un ordenador. Está fuertemente vinculado con la realidad aumentada, ya que es imprescindible para poder transmitir la información del medio al ordenador encargado de generar imágenes correspondientes.
+Entre los objetivos de la visión artificial se encuentra la capacidad de reconocer patrones dentro de una imagen o vídeo con el fin de poder extraer las características de los objetos dentro de dicho medio y procesarlas.
+Otro objetivo es la reconstrucción 3D a partir de imágenes, que pretende generar volúmenes 3D desde las imágenes obtenidas; esto es especialmente importante en la realidad aumentada porque permite una mayor percepción de la profundidad sobre el medio generado por ordenador.
