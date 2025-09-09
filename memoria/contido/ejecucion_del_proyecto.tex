@@ -98,47 +98,47 @@ Si bien existen aproximaciones que buscan puntos claves de las figuras o reconoc
     \item \textbf{Simplicidad de implementación}: Dados los recursos disponibles, se optó por utilizar la librería ArUco para generar y seguir el marcador, aprovechando su madurez y estabilidad.
 \end{itemize}
 
-\subsection{Fundamentos teóricos del seguimiento con ArUco}
+\subsection{Implementación del seguimiento con ArUco}
 
-ArUco a la hora de detectar la posición de un marcador, trabaja con un modelo de coordenadas pin-hole, donde las coordenadas y rotación de los objetos detectados se expresan en función de la posición de la cámara.
-El calibrado de la cámara permite determinar la proyección de cualquier punto en las 3 dimensiones del espacio en el sensor de la cámara. En una cámara ideal, un punto 3D $(X, Y, Z)$ en el espacio se proyectaría en el píxel:
-\begin{align*}
-	x_{ideal} & = \frac{X \cdot fx}{Z} + cx & y_{ideal} = \frac{Y \cdot fy}{Z} + cy
-\end{align*}
+Para la implementación del sistema de seguimiento en este proyecto, se utilizó la librería ArUco aprovechando los fundamentos teóricos de visión por computador descritos en la Sección~\ref{chap:ft}. La integración con Exposure Render requirió adaptaciones específicas para compatibilizar los sistemas de coordenadas y garantizar un seguimiento robusto en tiempo real.
 
-Sin embargo, las lentes reales introducen distorsiones que deben corregirse. Las coordenadas finales del píxel se calculan aplicando las correcciones de distorsión radial y tangencial:
-\begin{align*}
-	x_{distorsionada} &= x_{ideal} \cdot (1 + k_1 r^2 + k_2 r^4 + k_3 r^6) + 2p_1 x_{ideal} y_{ideal} + p_2(r^2 + 2x_{ideal}^2) \\
-	y_{distorsionada} &= y_{ideal} \cdot (1 + k_1 r^2 + k_2 r^4 + k_3 r^6) + p_1(r^2 + 2y_{ideal}^2) + 2p_2 x_{ideal} y_{ideal}
-\end{align*}
-donde $r^2 = x_{ideal}^2 + y_{ideal}^2$ es la distancia radial al centro de la imagen.
+\paragraph{Selección del diccionario de marcadores.}
+En la implementación actual se emplea el diccionario \texttt{DICT\_6X6\_250}, que contiene 250 marcadores únicos de 6×6 bits cada uno. Este diccionario fue seleccionado por ofrecer un buen equilibrio entre:
 
-Donde:
 \begin{itemize}
-	\item $fx$, $fy$: Es la longitud focal de la lente de la cámara en ambos ejes (píxeles).
-	\item $cx$, $cy$: Es el centro óptico del sensor (expresado en píxeles).
-	\item $k1$, $k2$, $k3$: Son los coeficientes de distorsión radial que corrigen la curvatura de la lente.
-	\item $p1$, $p2$: Son los coeficientes de distorsión tangencial que corrigen la desalineación de la lente.
+	\item \textbf{Detectabilidad}: Los marcadores de 6×6 bits proporcionan suficiente información para una detección robusta incluso en condiciones de iluminación variable.
+	\item \textbf{Capacidad de identificación}: Con 250 marcadores únicos disponibles, se dispone de suficiente variedad para diferentes configuraciones experimentales.
+	\item \textbf{Eficiencia computacional}: El tamaño moderado permite un procesamiento en tiempo real sin comprometer la precisión.
 \end{itemize}
-Asumiendo que la ubicación tridimensional del punto con respecto al sistema de referencia de la cámara es conocida. Si se desea conocer la proyección de un punto referido a un sistema de referencia arbitrario, entonces deben mencionarse parámetros extrínsecos. Los parámetros extrínsecos consisten básicamente en las rotaciones tridimensionales (Rvec = {Rx, Ry, Rz}) y las traslaciones tridimensionales (Tvec = {Tx, Ty, Tz}) requeridas para trasladar el sistema de referencia de la cámara al sistema arbitrario. Los elementos de rotación se expresan mediante la fórmula de Rodrigues \cite{mebius2007derivation}, por lo que es posible obtener la matriz de rotación equivalente de 3x3 utilizando la función cv::Rodrigues() de OpenCV.
 
-Cada marcador detectado devuelve como coordenadas la esquina superior izquierda del mismo, o lo que se etiqueta en el ejemplo de la \figurename~\ref{fig:marker_schema} como \emph{corner 0}, en forma de (Rvec = {Rx, Ry, Rz}) como vector de rotación y (Tvec = {Tx, Ty, Tz}) como vector de translación.
+\paragraph{Configuración del sistema de seguimiento.}
+Como se explicó en la Sección~\ref{chap:ft}, cada marcador detectado proporciona vectores de rotación (Rvec) y traslación (Tvec) respecto al sistema de coordenadas de la cámara. En este proyecto, estas coordenadas se referencian desde la esquina superior izquierda del marcador (corner 0), como se muestra en la \figurename~\ref{fig:marker_schema}.
 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.5\textwidth]{imaxes/marker_schema.png}
-	\caption{Esquema de un marcador.}
+	\caption{Esquema de un marcador ArUco mostrando el sistema de coordenadas de referencia.}
 	\label{fig:marker_schema}
 \end{figure}
 
-Detectar un solo marcador puede fallar por diferentes razones, como malas condiciones de iluminación, movimiento rápido de la cámara, obstrucciones, etc. Para superar ese problema, ArUco permite el uso de tablas de marcadores como la mostrada en la \figurename~\ref{fig:board_schema}. Cada tabla de marcadores está compuesta por varios marcadores en ubicaciones conocidas. Presentan dos ventajas principales. Primero, dado que hay más de un marcador, es menos probable perderlos todos de vista al mismo tiempo. Segundo, cuanto más marcadores se detecten, más puntos están disponibles para calcular los parámetros extrínsecos de la cámara. Como consecuencia, se obtiene una mayor precisión.
+Para mejorar la robustez del seguimiento, se implementó un sistema basado en tablas de marcadores siguiendo los principios descritos en los fundamentos teóricos. La configuración utilizada se muestra en la \figurename~\ref{fig:board_schema}, donde múltiples marcadores en posiciones conocidas proporcionan redundancia frente a oclusiones parciales y mejoran la precisión en la estimación de la pose.
 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.4\textwidth, angle=90]{imaxes/board_schema.png}
-	\caption{Esquema de una tabla de marcadores.}
+	\caption{Configuración de la tabla de marcadores utilizada en el proyecto.}
 	\label{fig:board_schema}
 \end{figure}
+
+\paragraph{Integración con Exposure Render.}
+La principal adaptación requerida para la integración con Exposure Render consistió en la transformación de coordenadas entre los sistemas de referencia de ArUco y el motor de renderizado. Esta transformación se implementa en la función \texttt{getCubePoseMatrix}, que convierte los vectores de rotación y traslación proporcionados por ArUco en matrices de transformación 4×4 compatibles con el sistema de renderizado.
+
+El proceso de integración incluye:
+\begin{enumerate}
+	\item \textbf{Construcción de la matriz de transformación}: Conversión de los vectores Rvec y Tvec de ArUco a una matriz de transformación 4×4 que representa la pose del marcador respecto a la cámara.
+	\item \textbf{Conversión de sistemas de coordenadas}: Compatibilización entre el orden \gls{rowmajor} de OpenCV y \gls{columnmajor} de OSG mediante transposición matricial.
+	\item \textbf{Sincronización temporal}: Implementación de mecanismos para mantener la coherencia entre las actualizaciones del sistema de seguimiento y el ciclo de renderizado.
+\end{enumerate}
 
 \subsection{Generación de marcadores a partir de diccionarios predefinidos}
 El marcador fiduciario utilizado en este proyecto se genera a partir de un diccionario predefinido de ArUco. En la implementación actual se emplea el diccionario \texttt{DICT\_6X6\_250}, que contiene 250 marcadores únicos de 6×6 bits cada uno. Este diccionario fue seleccionado por ofrecer un buen equilibrio entre:
@@ -452,4 +452,26 @@ int main()
 \end{lstlisting}
 
 Esta arquitectura modular permite que la aplicación funcione como una herramienta independiente y versátil para la visualización de modelos 3D en realidad aumentada. El diseño implementado demuestra la efectividad del sistema de \gls{tracking} desarrollado y proporciona una base sólida para futuras extensiones y mejoras. La separación en módulos independientes facilita la integración con otros sistemas de renderizado y permite adaptar la solución a diferentes casos de uso manteniendo la robustez del seguimiento de marcadores.
+
+\section{Resultados de la implementación}
+\label{sec:resultados}
+
+Una vez completado el desarrollo del sistema de seguimiento y la aplicación de realidad aumentada, se realizaron pruebas en diferentes escenarios para validar la robustez y precisión del sistema implementado. Las pruebas se centraron en evaluar el comportamiento del sistema bajo tres condiciones representativas:
+
+\begin{itemize}
+	\item \textbf{Escenario sin obstrucciones}: Evaluación del seguimiento con el marcador completamente visible y en posición frontal respecto a la cámara.
+	\item \textbf{Escenario con múltiples caras visibles}: Análisis del comportamiento del sistema cuando el marcador se encuentra inclinado con respecto a la cámara.
+	\item \textbf{Escenario con oclusión parcial}: Validación de la robustez del seguimiento cuando parte del marcador cúbico está oculto.
+\end{itemize}
+
+Para cada uno de estos escenarios se capturaron cuatro tipos de imágenes que ilustran el pipeline completo de procesamiento:
+
+\begin{enumerate}
+	\item \textbf{Imagen original}: Frame directo de la cámara sin procesamiento.
+	\item \textbf{Imagen corregida}: Frame tras aplicar la corrección de la distorsión.
+	\item \textbf{Visualización de ejes}: Frame con los ejes de coordenadas renderizados por OpenCV para validar la precisión de la estimación de pose.
+	\item \textbf{Renderizado del modelo}: Frame final con el modelo 3D renderizado utilizando OpenGL.
+\end{enumerate}
+
+Los resultados obtenidos demuestran que el sistema desarrollado cumple satisfactoriamente con los objetivos planteados, manteniendo un seguimiento estable incluso con oclusiones parciales. Las capturas detalladas de estos escenarios de prueba se presentan en el Apéndice~\ref{chap:capturas}.
 

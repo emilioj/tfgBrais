@@ -97,10 +97,68 @@ En 1994, \citeauthor{Milgram1994ATO}~\cite{Milgram1994ATO} acuñan el término d
 \paragraph{Realidad aumentada.}
 Posteriormente \citeauthor{Azuma1997}~\cite{Azuma1997} definía la \acrlong{ar} como una variación de la \acrlong{vr}, en la cual el usuario es capaz de ver el mundo real, con objetos virtuales superpuestos, o compuestos por el mundo real. La posibilidad de crear objetos y prototipos de forma rápida, sobre los cuales poder iterar y componer imágenes virtuales, demuestra el potencial de estas tecnologías inmersivas trabajando a la par. En la actualidad sus principales aplicaciones se encuentran, además de en juegos y entretenimiento, en educación, medicina, arquitectura, ingeniería e interpretación del patrimonio.
 
-%La realidad aumentada es una tecnología que combina elementos virtuales con el mundo real, permitiendo a los usuarios interactuar con objetos y escenarios virtuales en tiempo real.
-
 \section{Visión Artificial}
 
 Se denomina visión artificial al campo que incluye los métodos necesarios para adquirir, procesar, analizar y comprender las imágenes del mundo real con el fin de producir información procesable por un ordenador. Está fuertemente vinculado con la realidad aumentada, ya que es imprescindible para poder transmitir la información del medio al ordenador encargado de generar imágenes correspondientes.
 Entre los objetivos de la visión artificial se encuentra la capacidad de reconocer patrones dentro de una imagen o vídeo con el fin de poder extraer las características de los objetos dentro de dicho medio y procesarlas.
 Otro objetivo es la reconstrucción 3D a partir de imágenes, que pretende generar volúmenes 3D desde las imágenes obtenidas; esto es especialmente importante en la realidad aumentada porque permite una mayor percepción de la profundidad sobre el medio generado por ordenador.
+
+\section{Marcadores Fiduciarios y Seguimiento de Objetos}
+
+Los marcadores fiduciarios constituyen una tecnología fundamental en aplicaciones de realidad aumentada y seguimiento de objetos. Estos patrones visuales proporcionan referencias conocidas que permiten a los sistemas de visión por computador determinar con precisión la posición y orientación de objetos en el espacio tridimensional.
+
+\subsection{Modelo de cámara pin-hole}
+
+El modelo de cámara \gls{pinhole} es una descripción matemática fundamental que define la relación entre las coordenadas de un punto en el espacio tridimensional y su proyección en el plano de imagen de una cámara. Este modelo es ampliamente utilizado en visión por computador y aplicaciones de realidad aumentada para el seguimiento de objetos y la estimación de pose.
+
+\paragraph{Proyección en cámara ideal.}
+En una cámara ideal que sigue el modelo pin-hole, un punto 3D $(X, Y, Z)$ en el espacio se proyecta en el píxel de la imagen según las ecuaciones:
+\begin{align*}
+	x_{ideal} & = \frac{X \cdot fx}{Z} + cx & y_{ideal} = \frac{Y \cdot fy}{Z} + cy
+\end{align*}
+
+donde los parámetros intrínsecos de la cámara son:
+\begin{itemize}
+	\item $fx$, $fy$: Longitud focal de la lente en ambos ejes (expresada en píxeles).
+	\item $cx$, $cy$: Centro óptico del sensor (expresado en píxeles), también conocido como punto principal.
+\end{itemize}
+
+\paragraph{Corrección de distorsiones.}
+Las lentes reales introducen distorsiones que deben corregirse para obtener mediciones precisas. Las coordenadas finales del píxel se calculan aplicando las correcciones de distorsión radial y tangencial:
+\begin{align*}
+	x_{distorsionada} &= x_{ideal} \cdot (1 + k_1 r^2 + k_2 r^4 + k_3 r^6) + 2p_1 x_{ideal} y_{ideal} + p_2(r^2 + 2x_{ideal}^2) \\
+	y_{distorsionada} &= y_{ideal} \cdot (1 + k_1 r^2 + k_2 r^4 + k_3 r^6) + p_1(r^2 + 2y_{ideal}^2) + 2p_2 x_{ideal} y_{ideal}
+\end{align*}
+donde $r^2 = x_{ideal}^2 + y_{ideal}^2$ es la distancia radial al centro de la imagen, y los parámetros de distorsión son:
+\begin{itemize}
+	\item $k_1$, $k_2$, $k_3$: Coeficientes de distorsión radial que corrigen la curvatura de la lente.
+	\item $p_1$, $p_2$: Coeficientes de distorsión tangencial que corrigen la desalineación de la lente.
+\end{itemize}
+
+\paragraph{Parámetros extrínsecos.}
+Para conocer la proyección de un punto referido a un sistema de referencia arbitrario diferente al de la cámara, se utilizan los parámetros extrínsecos. Estos consisten en las rotaciones tridimensionales (Rvec = {Rx, Ry, Rz}) y las traslaciones tridimensionales (Tvec = {Tx, Ty, Tz}) necesarias para transformar el sistema de referencia de la cámara al sistema de coordenadas del objeto. Los elementos de rotación se expresan mediante la fórmula de Rodrigues \cite{mebius2007derivation}, permitiendo obtener la matriz de rotación equivalente de 3×3.
+
+\subsection{Marcadores fiduciarios}
+
+Los marcadores fiduciarios son patrones visuales diseñados específicamente para ser detectados y seguidos por sistemas de visión por computador. En aplicaciones de realidad aumentada, proporcionan una referencia conocida que permite determinar la posición y orientación de objetos en el espacio tridimensional.
+
+\paragraph{Marcadores ArUco.}
+ArUco es una librería de código abierto para la detección de marcadores cuadrados planos. Cada marcador ArUco consiste en un borde negro ancho y un patrón binario interior que determina su identificador. La librería utiliza el modelo de cámara pin-hole para calcular la \gls{pose} (posición y orientación) de cada marcador detectado respecto a la cámara.
+
+Cada marcador detectado por ArUco proporciona como resultado:
+\begin{itemize}
+	\item Vector de rotación (Rvec = {Rx, Ry, Rz}) que describe la orientación del marcador.
+	\item Vector de traslación (Tvec = {Tx, Ty, Tz}) que indica la posición del marcador respecto a la cámara.
+\end{itemize}
+
+Las coordenadas se referencian desde la esquina superior izquierda del marcador, proporcionando un sistema de coordenadas consistente para el seguimiento.
+
+\paragraph{Tablas de marcadores.}
+Para mejorar la robustez del seguimiento, ArUco permite el uso de tablas de marcadores (\emph{marker boards}). Estas consisten en múltiples marcadores individuales dispuestos en ubicaciones conocidas dentro de una superficie plana. Las tablas de marcadores ofrecen ventajas significativas:
+
+\begin{itemize}
+	\item \textbf{Robustez frente a oclusiones}: Al tener múltiples marcadores, es menos probable perder todos de vista simultáneamente.
+	\item \textbf{Mayor precisión}: Cuantos más marcadores se detecten, más puntos están disponibles para calcular los parámetros extrínsecos de la cámara, resultando en una estimación más precisa de la pose.
+\end{itemize}
+
+Esta redundancia es especialmente valiosa en aplicaciones donde las condiciones de iluminación pueden variar o donde pueden producirse oclusiones parciales del sistema de marcadores.
