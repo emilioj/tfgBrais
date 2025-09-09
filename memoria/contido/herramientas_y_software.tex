@@ -30,7 +30,7 @@ Una alternativa de software libre para la reparación de mallas 3D es \href{http
     \subsection{Blender}
 Blender es un potente software de modelado, animación, renderizado y edición 3D de código abierto y gratuito. Ofrece una suite completa de herramientas para la creación y manipulación de modelos 3D, incluyendo texturizado, iluminación, simulación física y composición. En este proyecto, se utilizó para procesar y refinar modelos 3D generados a partir de imágenes médicas, aprovechando su flexibilidad para trabajar con formatos como STL y OBJ, y su capacidad para integrar scripts en Python para automatizar tareas.
     \subsection{UltiMaker Cura}
-UltiMaker Cura es el programa desarrollado por UltiMaker para generar el GCODE necesario para imprimir modelos en una impresora de dicha marca. Se utilizó ya que permite importar ajustes específicos de la impresora sobre la que se trabajo de forma sencilla.
+UltiMaker Cura es el programa desarrollado por UltiMaker para generar el GCODE necesario para imprimir modelos en una impresora de dicha marca. Se utilizó ya que permite importar ajustes específicos de la impresora sobre la que se trabajó de forma sencilla.
 \section{Frameworks}
 \subsection{OpenXR}
 OpenXR es una \acrfull{api} multiplataforma que permite el desarrollo de medios en el \textit{virtual continuum} mediante ordenadores a través de interacción humano-máquina.
@@ -69,12 +69,12 @@ Esta arquitectura permite el desarrollo multiplataforma con mayor simplicidad, p
 \end{figure}
 
 \subsection{OpenCV}
-\acrfull{opencv} es una librería de código abierto que implementa principalmente funciones de visión artificial en tiempo real. Se utilizó para la generación y el seguimiento de los marcadores ARuco que forma parte de los paquetes adicionales de la librería.
+\acrfull{opencv} es una librería de código abierto que implementa principalmente funciones de visión artificial en tiempo real. Se utilizó para la generación y el seguimiento de los marcadores ArUco que forma parte de los paquetes adicionales de la librería.
 
 \subsection{OpenSceneGraph}
 \acrfull{osg} es una librería gráfica 3D de código abierto escrita en C++ que encapsula la funcionalidad de OpenGL mediante una arquitectura basada en grafos de escena. Esta estructura permite organizar eficientemente objetos 3D, transformaciones y materiales en aplicaciones de renderizado en tiempo real.
 
-En este proyecto, \acrshort{osg} es utilizado por Exposure Render como motor de renderizado para la visualización de volúmenes médicos en entornos de realidad virtual.
+En este proyecto, \acrshort{osg} se utiliza para renderizar la interfaz de usuario en modo VR, proporcionando las herramientas necesarias para interactuar con la visualización en el entorno de realidad virtual.
 
 \subsection{Assimp}
 \acrfull{assimp} es una librería portátil de código abierto diseñada para importar múltiples formatos de modelos 3D. La librería soporta decenas de formatos de archivo diferentes incluyendo FBX, OBJ, 3DS, DAE, entre otros. En este proyecto se utiliza para cargar modelos 3D anatómicos generados a partir de imágenes de \acrshort{tc}, proporcionando una interfaz consistente para acceder a geometrías, texturas y materiales independientemente del formato de archivo original.
@@ -88,7 +88,7 @@ En este proyecto, \acrshort{osg} es utilizado por Exposure Render como motor de 
 \subsection{GLM}
 \acrfull{glm} es una librería de matemáticas C++ diseñada específicamente para gráficos por computador basada en las especificaciones OpenGL Shading Language (GLSL). Proporciona clases y funciones para operaciones con vectores, matrices y transformaciones 3D. En este proyecto se utiliza para realizar cálculos de transformaciones geométricas, proyecciones de cámara y manipulación de matrices necesarias para el correcto posicionamiento de modelos 3D en el espacio de realidad aumentada.
 
-\subsection{ARuco}
+\subsection{ArUco}
 Los últimos años, los desarrollos de nuevos marcadores han tendido a un cuadrado negro con distintos patrones interiores, como en el ejemplo de la \figurename~\ref{fig:qrtags}, ya que permiten extraer la pose de la cámara a partir de sus 4 esquinas, asumiendo que esta esté adecuadamente calibrada \cite{GarridoJurado2014}. Esencialmente estos marcadores comparten ciertas características comunes en cuanto a su funcionamiento, entre todas las opciones disponibles se escogió ArUco como solución a nuestro proyecto por varios motivos:
 \begin{itemize}
     \item Diccionarios generados dinámicamente.
@@ -111,16 +111,16 @@ Los últimos años, los desarrollos de nuevos marcadores han tendido a un cuadra
   \label{fig:qrtags}
 \end{figure}
 
-\subsection{Funcionamiento de Aruco}
+\subsection{Funcionamiento de ArUco}
 
 \subsubsection*{Captura de imágenes o videos}
-La captura de imágenes o vídeos se realiza mediante un dispositivo específico, como una cámara digital o un dispositivo móvil con cámara incorporada. En este paso se espera obtener una serie de imágenes o un vídeo sobre el que se espera encontrar uno o varios marcadores ARuco.
+La captura de imágenes o vídeos se realiza mediante un dispositivo específico, como una cámara digital o un dispositivo móvil con cámara incorporada. En este paso se espera obtener una serie de imágenes o un vídeo sobre el que se espera encontrar uno o varios marcadores ArUco.
 \subsubsection*{Conversión a escala de grises}
 La conversión a escala de grises se realiza mediante el algoritmo de promedio ponderado de los canales RGB. Esta conversión reduce la cantidad de información a procesar y mejora la velocidad de procesamiento al trabajar con un único canal de información.
 \subsubsection*{Aplicación de un filtro de bordes}
 Para resaltar los bordes de los marcadores en la imagen se aplica un filtro de bordes. Un ejemplo común es el algoritmo de Canny, que se basa en la detección de gradientes y utiliza un umbral para determinar que bordes son relevantes y cuales no.
 \subsubsection*{Detección de contornos}
-Se utiliza un algoritmo de detección de contornos adaptativo para encontrar los contornos de los marcadores en la imagen. Un algoritmo común es el Transformada de Hough que permite detectar contornos circulares y lineales en la imagen. Este algoritmo busca patrones en la imagen que se correspondan con los contornos de los marcadores ARuco.
+Se utiliza un algoritmo de detección de contornos adaptativo para encontrar los contornos de los marcadores en la imagen. Un algoritmo común es el Transformada de Hough que permite detectar contornos circulares y lineales en la imagen. Este algoritmo busca patrones en la imagen que se correspondan con los contornos de los marcadores ArUco.
 En un sistema de thresholding tradicional, se elige un umbral global para toda la imagen. Cualquier píxel con un valor de brillo superior al umbral se considera activo (p.ej. negro) y cualquier píxel con un valor de brillo inferior al umbral se considera inactivo (p.ej. blanco). Sin embargo, en muchas imágenes, el nivel óptimo de umbral puede variar entre diferentes partes de la imagen. El thresholding adaptativo se utiliza para solucionar este problema.
 
 El thresholding adaptativo se divide en dos pasos:
@@ -139,7 +139,7 @@ Cada uno de estos métodos tiene sus propios pros y contras y en función de la 
 Además es posible modificar los siguientes parámetros para adecuar la librería a nuestro caso de uso, los más importantes son:
 \begin{itemize}
     \item   \textbf{markerBorderBits:}
-    El número de bits que se utilizan para representar el borde de un marcador. El borde de un marcador es el área blanca que rodea el patrón de código de barras en un marcador ARuco. El valor predeterminado es 4.
+    El número de bits que se utilizan para representar el borde de un marcador. El borde de un marcador es el área blanca que rodea el patrón de código de barras en un marcador ArUco. El valor predeterminado es 4.
     \item \textbf{adaptiveThreshWinSizeMin and adaptiveThreshWinSizeMax:}
     El tamaño mínimo y máximo de la ventana utilizada para la umbralización adaptativa. La umbralización adaptativa es un método para determinar automáticamente el valor de umbral óptimo para una imagen. Estos parámetros se utilizan para especificar el tamaño de la ventana en píxeles que se utilizará para la umbralización adaptativa.
     \item \textbf{adaptiveThreshWinSizeMax:}
@@ -158,7 +158,7 @@ Además es posible modificar los siguientes parámetros para adecuar la librerí
 
 \subsubsection*{Extracción de Bits}
 Los bits extraídos de cada candidato se analizan para determinar si corresponden a marcadores válidos.
-Para ello se somete cada sección de la imagen a una corrección de perspectiva. A continuación se subdivide el candidato en la cantidad previamente establecida en el diccionario de bits que componen cada marcador. Dado que en un bit pueden encontrarse píxeles de los bits contiguos o errores en la imagen capturada por la cámara, se establece el valor del bit en función de la desviación típica de los píxeles de dicho bit, como en el ejemplo de la \figurename~\ref{fig:mbe}.
+Para ello se somete cada sección de la imagen a una corrección de perspectiva. A continuación se subdivide el candidato en la cantidad previamente establecida en el diccionario de bits que componen cada marcador. La imagen corregida se binariza utilizando el \gls{otsu} para separar píxeles blancos y negros. Posteriormente, la imagen se divide en una cuadrícula con el mismo número de celdas que bits tiene el marcador. En cada celda se cuenta el número de píxeles blancos y negros para determinar el valor del bit asignado a dicha celda (mediante el valor mayoritario), como en el ejemplo de la \figurename~\ref{fig:mbe}.
 
 \begin{figure}
   \centering
@@ -168,14 +168,14 @@ Para ello se somete cada sección de la imagen a una corrección de perspectiva.
 
 \subsubsection*{Identificación de Marcadores}
 Se verifica si el código extraído pertenece al diccionario y, en caso necesario, se aplican algoritmos de corrección de errores.
-La primera operación consiste en determinar la cantidad de bits erróneos permitidos en el borde de un marcador, ya que todos los marcadores ARuco cuentan al menos con un bit de borde. En lo que a corrección de errores se refiere, cada diccionario cuenta con un límite teórico de bits que pueden ser corregidos.
+La primera operación consiste en determinar la cantidad de bits erróneos permitidos en el borde de un marcador, ya que todos los marcadores ArUco cuentan al menos con un bit de borde. En lo que a corrección de errores se refiere, cada diccionario cuenta con un límite teórico de bits que pueden ser corregidos.
 
 \subsubsection*{Refinado de Esquinas}
-Se puede realizar un refinado a nivel de subpíxel de las esquinas para mejorar la precisión del sistema. Este ultimo paso es altamente costoso a nivel computacional, pero se recomienda en aplicaciones en las que prima la precisión como es el caso.
+Se puede realizar un refinado a nivel de subpíxel de las esquinas para mejorar la precisión del sistema. Este último paso implica una alta carga computacional, pero se recomienda en aplicaciones en las que prima la precisión como es el caso.
 
-Esta librería trabaja con un Pinhole Camera Model lo que quiere decir que se considera como el origen de coordenadas el punto en el que todos los rayos de luz convergerían en una supuesta cámara estenopeica ideal.
+Esta librería trabaja con un \gls{pinhole} lo que quiere decir que se considera como el origen de coordenadas el punto en el que todos los rayos de luz convergerían en una supuesta cámara estenopeica ideal.
 
-Las coordenadas se definen de la siguiente forma: Z crece frente a la cámara mientras que X e Y se encuentran en el plano ortogonal de Z. X aumenta de derecha a izquierda e Y de abajo a arriba.
+Las coordenadas se definen de la siguiente forma: Z crece frente a la cámara mientras que X e Y se encuentran en el plano ortogonal de Z. X aumenta de izquierda a derecha e Y de abajo a arriba.
 
 
 
@@ -188,9 +188,11 @@ Las coordenadas se definen de la siguiente forma: Z crece frente a la cámara mi
 Se utilizaron dos impresoras 3D a lo largo del proyecto puesto que eran necesarios distintos requisitos para cada pieza.
 Los modelos anatómicos debido a su complejidad se imprimieron en una impresora Fuse 1+ 30W que utiliza polvo de nylon para llevar a cabo las piezas.
 Para los marcadores fiduciarios, se utilizó la Ultimaker 3, ya que se trata de figuras más simples en las que la posibilidad de imprimir en distintos colores era especialmente importante.
-\subsection{Cámara Web}
+\subsection{Obtención de vídeo}
+Inicialmente se intentaron utilizar las cámaras frontales integradas del \acrshort{hmd} HTC Vive Pro 2 para esta función, pero debido a limitaciones técnicas en el acceso nativo a las cámaras (como se detalla en la Sección~\ref{subsec:captura_imagen}), se optó por utilizar una cámara externa.
+
 \subsubsection{Logitech Brio 500}
-La Logitech Brio 500 es una cámara web de alta calidad que ofrece grabación en HD a 60 fps. Esta cámara fue utilizada para la captura de imágenes y video en el desarrollo del sistema de realidad aumentada, proporcionando la entrada visual necesaria para el seguimiento de marcadores ARuco y la calibración del sistema.
-\subsection{\acrfull{hmd}}
-Para la implementación del sistema de captación de imagen y tracking se utilizó un casco HTC Vive Pro 2.
+La Logitech Brio 500 es una cámara web de alta calidad que ofrece grabación en HD a 60 fps. Esta cámara fue utilizada para la captura de imágenes y video en el desarrollo del sistema de realidad aumentada, proporcionando la entrada visual necesaria para el seguimiento de marcadores ArUco y la calibración del sistema. 
+
+
 

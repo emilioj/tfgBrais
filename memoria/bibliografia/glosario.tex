@@ -19,9 +19,9 @@
 	name=Pinhole camera model,
 	description={Descripcion de la relación matemática entre las coordenadas de un punto en el espacio de tres dimensiones y su proyección en el plano de imagen de una supuesta cámara estenopeica ideal}
 }
-\newglossaryentry{worldmatrix}{
-	name=World matrix,
-	description={Matriz de transformación 4×4 que define la posición, rotación y escala de un objeto en el espacio de coordenadas mundial (global) del sistema de renderizado 3D}
+\newglossaryentry{worldspace}{
+	name=World space,
+	description={Espacio de coordenadas mundial o global que define el sistema de coordenadas absoluto del entorno 3D, en el cual se posicionan todos los objetos de la escena}
 }
 \newglossaryentry{viewmatrix}{
 	name=View matrix,
@@ -50,4 +50,12 @@
 \newglossaryentry{phong}{
 	name=Modelo de iluminación Phong,
 	description={Modelo empírico desarrollado por Bui Tuong Phong que calcula la iluminación de una superficie combinando tres componentes: luz ambiente, luz difusa y luz especular. Es ampliamente utilizado en gráficos por computador por su simplicidad y resultados visualmente aceptables}
+}
+\newglossaryentry{otsu}{
+	name=Método de Otsu,
+	description={Algoritmo de umbralización automática desarrollado por Nobuyuki Otsu en 1979 que determina automáticamente el valor de umbral óptimo para binarizar una imagen basándose en la minimización de la varianza intraclase de los píxeles}
+}
+\newglossaryentry{lambert}{
+	name=Reflexión lambertiana,
+	description={Modelo de reflexión difusa ideal desarrollado por Johann Heinrich Lambert \cite{lambert1760photometria} en el que la superficie refleja la luz uniformemente en todas las direcciones, con la intensidad de la luz reflejada proporcional al coseno del ángulo entre la dirección de la luz incidente y la normal de la superficie (ley del coseno de Lambert)}
 }

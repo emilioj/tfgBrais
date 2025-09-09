@@ -69,7 +69,7 @@ void cubeCoordinates(int id, cv::Vec3d& rvecs, cv::Vec3d& tvecs, float sideLengt
 \section{Transformaciones de coordenadas entre sistemas}
 
 \subsection{Conversión del espacio de cámara al espacio del cubo}
-ARuco proporciona la pose del marcador como vectores de rotación y traslación que se convierten en una matriz de transformación 4×4:
+ArUco proporciona la pose del marcador como vectores de rotación y traslación que se convierten en una matriz de transformación 4×4:
 
 \begin{lstlisting}[language=C++]
 cv::Mat cubeTransform = buildTransformation(rvecFinal, tvecFinal);

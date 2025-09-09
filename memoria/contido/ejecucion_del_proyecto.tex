@@ -3,7 +3,13 @@
 Este capítulo tiene como objetivo tratar el desarrollo del proyecto en sí mismo, así como discutir las opciones disponibles durante el progreso y las decisiones tomadas para llevarlo a cabo.
 
 \section{Consideraciones previas}
-Este trabajo nace como un desarrollo del proyecto troncal de \citeauthor{IglesiasGuitian2022} y como tal se debe ceñir a las condiciones que acarrea dicho proyecto. Todo el equipo utilizado durante el desarrollo fue provisto por parte del mismo, o en su defecto por parte del \acrfull{citic}.
+Este traLa función \texttt{getCubePoseMatrix} implementa una serie de transformaciones para que la pose del cubo detectada por ArUco sea directamente utilizable por el motor de renderizado de Exposure Render. El proceso incluye:
+
+\begin{enumerate}
+    \item \textbf{Construcción de la matriz de transformación}: Conversión de vectores de rotación y traslación de ArUco a matriz de transformación 4×4 que representa la pose del marcador respecto a la cámara.
+    \item \textbf{Inversión para obtener la matriz modelo}: La matriz construida representa la transformación del cubo hacia la cámara (view matrix). Se invierte para obtener la matriz modelo del cubo en el espacio de coordenadas de la cámara, necesaria para el posicionamiento de objetos virtuales.
+    \item \textbf{Conversión de sistemas de coordenadas}: Compatibilización entre el orden row-major de OpenCV y column-major de OSG mediante transposición matricial.
+\end{enumerate}ce como un desarrollo del proyecto troncal de \citeauthor{IglesiasGuitian2022} y como tal se debe ceñir a las condiciones que acarrea dicho proyecto. Todo el equipo utilizado durante el desarrollo fue provisto por parte del mismo, o en su defecto por parte del \acrfull{citic}.
 
 \section{Análisis}
 Se llevó a cabo un estudio para definir la hoja de ruta del proyecto. Dada la problemática a solventar, este trabajo alcanza a tocar áreas bien diferenciadas entre si que se pueden destacar como los pasos a seguir del mismo:
@@ -14,11 +20,11 @@ Se llevó a cabo un estudio para definir la hoja de ruta del proyecto. Dada la p
 	\item Integrar la solución sobre un \acrshort{hmd}.
 \end{itemize}
 
-Fruto de la investigación surge el artículo de  \citeauthor{MoretaMartinez2020}; que expone una solución existente a los objetivos de este trabajo mediante el uso de software bajo licencia o de pago.  Es por ello que se toma una aproximación similar al problema, sobre todo en las fases iniciales, para la generación de los volúmenes a pesar de implementar una solución propia para lo que a seguimiento se refiere. Este estudio también permitió especificar los requisitos necesarios para el software de tracking.
+Fruto de la investigación surge el artículo de \citeauthor{MoretaMartinez2020}, que expone una solución existente a los objetivos de este trabajo mediante el uso de software bajo licencia o de pago. Por este motivo, se adoptó una aproximación similar al problema, especialmente en las fases iniciales relacionadas con la generación de volúmenes, aunque se desarrolló una solución propia para el sistema de seguimiento. Este estudio también permitió especificar los requisitos necesarios para el software de tracking.
 
 Uno de los principales requisitos debe ser la robustez del sistema frente a las oclusiones del marcador. Es necesario que el seguimiento sea posible a pesar de la oclusión parcial del marcador. Además, es preciso que a partir de una fuente de vídeo se puedan extraer las coordenadas del marcador, así como su rotación en el espacio. Destacar también que el seguimiento debe ocurrir en un segundo plano, entorpeciendo lo menos posible las operaciones del hilo principal de ejecución, ya que parte de estas operaciones tiene una latencia crítica.
 
-Este trabajo nace como un desarrollo del proyecto troncal de \citeauthor{IglesiasGuitian2022}, y como tal, debe ceñirse a ciertas pautas del mismo. Exposure Render cuenta con un módulo de realidad virtual, en el que se integrará la solución de tracking para lograr un control más natural sobre el modelo a tratar, moviéndose en las imágenes renderizadas a la par que se mueve en la realidad, como se muestra en el diagrama de secuencia de la \figurename~\ref{fig:flow_exposure}.
+Exposure Render cuenta con un módulo de realidad virtual, en el que se integrará la solución de tracking para lograr un control más natural sobre el modelo a tratar, moviéndose en las imágenes renderizadas a la par que se mueve en la realidad, como se muestra en el diagrama de secuencia de la \figurename~\ref{fig:flow_exposure}.
 
 \begin{figure}
 	\centering
@@ -89,7 +95,7 @@ Si bien existen aproximaciones que buscan puntos claves de las figuras o reconoc
 \begin{itemize}
     \item \textbf{Independencia del hardware}: Permite replicar el seguimiento del objeto independientemente del hardware utilizado, ya que una vez calibrada la cámara no se requiere ningún otro tipo de ajuste en el sistema.
     \item \textbf{Robustez frente a oclusiones}: Permite mantener el seguimiento a pesar de que parte del marcador se encuentre ocluido o no esté completamente en el campo de visión de la cámara.
-    \item \textbf{Simplicidad de implementación}: Dados los recursos disponibles, se optó por utilizar la librería ARuco para generar y seguir el marcador, aprovechando su madurez y estabilidad.
+    \item \textbf{Simplicidad de implementación}: Dados los recursos disponibles, se optó por utilizar la librería ArUco para generar y seguir el marcador, aprovechando su madurez y estabilidad.
 \end{itemize}
 
 \subsection{Fundamentos teóricos del seguimiento con ArUco}
@@ -97,13 +103,22 @@ Si bien existen aproximaciones que buscan puntos claves de las figuras o reconoc
 ArUco a la hora de detectar la posición de un marcador, trabaja con un modelo de coordenadas pin-hole, donde las coordenadas y rotación de los objetos detectados se expresan en función de la posición de la cámara.
 El calibrado de la cámara permite determinar la proyección de cualquier punto en las 3 dimensiones del espacio en el sensor de la cámara. En una cámara ideal, un punto 3D $(X, Y, Z)$ en el espacio se proyectaría en el píxel:
 \begin{align*}
-	x & = \frac{X \cdot fx}{Z} + cx & y = \frac{Y \cdot fy}{Z} + cy
+	x_{ideal} & = \frac{X \cdot fx}{Z} + cx & y_{ideal} = \frac{Y \cdot fy}{Z} + cy
 \end{align*}
+
+Sin embargo, las lentes reales introducen distorsiones que deben corregirse. Las coordenadas finales del píxel se calculan aplicando las correcciones de distorsión radial y tangencial:
+\begin{align*}
+	x_{distorsionada} &= x_{ideal} \cdot (1 + k_1 r^2 + k_2 r^4 + k_3 r^6) + 2p_1 x_{ideal} y_{ideal} + p_2(r^2 + 2x_{ideal}^2) \\
+	y_{distorsionada} &= y_{ideal} \cdot (1 + k_1 r^2 + k_2 r^4 + k_3 r^6) + p_1(r^2 + 2y_{ideal}^2) + 2p_2 x_{ideal} y_{ideal}
+\end{align*}
+donde $r^2 = x_{ideal}^2 + y_{ideal}^2$ es la distancia radial al centro de la imagen.
+
 Donde:
 \begin{itemize}
-	\item $fx$, $fy$: Es la longitud focal de la lente de la cámara en ambos ejes.
+	\item $fx$, $fy$: Es la longitud focal de la lente de la cámara en ambos ejes (píxeles).
 	\item $cx$, $cy$: Es el centro óptico del sensor (expresado en píxeles).
-	\item $k1$, $k2$, $p1$, $p2$, $k3$: Son los coeficientes de distorsión radial y tangencial que permiten corregir las distorsiones introducidas por la lente real.
+	\item $k1$, $k2$, $k3$: Son los coeficientes de distorsión radial que corrigen la curvatura de la lente.
+	\item $p1$, $p2$: Son los coeficientes de distorsión tangencial que corrigen la desalineación de la lente.
 \end{itemize}
 Asumiendo que la ubicación tridimensional del punto con respecto al sistema de referencia de la cámara es conocida. Si se desea conocer la proyección de un punto referido a un sistema de referencia arbitrario, entonces deben mencionarse parámetros extrínsecos. Los parámetros extrínsecos consisten básicamente en las rotaciones tridimensionales (Rvec = {Rx, Ry, Rz}) y las traslaciones tridimensionales (Tvec = {Tx, Ty, Tz}) requeridas para trasladar el sistema de referencia de la cámara al sistema arbitrario. Los elementos de rotación se expresan mediante la fórmula de Rodrigues \cite{mebius2007derivation}, por lo que es posible obtener la matriz de rotación equivalente de 3x3 utilizando la función cv::Rodrigues() de OpenCV.
 
@@ -159,13 +174,13 @@ Esta implementación permite utilizar cualquier diccionario predefinido o person
 El proceso de determinación de la pose del cubo se realiza en varias etapas que transforman las detecciones individuales de cada cara en una pose unificada del centro del cubo.
 
 \subsubsection{Transformación de coordenadas de cara a centro}
-Cuando ARuco detecta una cara del cubo, devuelve la posición y orientación correspondientes a la esquina superior izquierda de esa cara (corner 0 en la \figurename~\ref{fig:marker_schema}). Para obtener la pose del centro del cubo, es necesario aplicar una transformación que tenga en cuenta tanto la posición como la orientación actual del marcador.
+Cuando ArUco detecta una cara del cubo, devuelve la posición y orientación correspondientes a la esquina superior izquierda de esa cara (corner 0 en la \figurename~\ref{fig:marker_schema}). Para obtener la pose del centro del cubo, es necesario aplicar una transformación que tenga en cuenta tanto la posición como la orientación actual del marcador.
 
 \subsection{Diseño geométrico del marcador cúbico}
 
 Debido a la versatilidad de las piezas con las que se pretende usar el marcador, se implementó priorizando eliminar las oclusiones del marcador por la pieza. Por este motivo se diseñó como un cubo, de forma que al menos una cara sería visible en todo momento. Se evaluaron otras formas geométricas (prismas rectangulares, pirámides, cilindros), pero estas demostraron menor efectividad de detección con la cámara utilizada en el desarrollo.
 
-El diseño final consiste en un cubo donde cada cara contiene una matriz 2×2 de marcadores del mismo diccionario ARuco. Esta configuración proporciona las siguientes ventajas:
+El diseño final consiste en un cubo donde cada cara contiene una matriz 2×2 de marcadores del mismo diccionario ArUco. Esta configuración proporciona las siguientes ventajas:
 
 \begin{itemize}
     \item \textbf{Redundancia}: Al tener múltiples marcadores por cara, el sistema puede mantener el tracking incluso si algunos marcadores están ocluidos.
@@ -176,8 +191,6 @@ El diseño final consiste en un cubo donde cada cara contiene una matriz 2×2 de
 Se llevaron a cabo pruebas con distintos diccionarios de marcadores, modificando las tolerancias para los márgenes entre marcadores y los bordes del cubo con el fin de poder mantener unas dimensiones manejables sin comprometer el tamaño de cada marcador individual.
 Finalmente, fruto de los tests, se llegó al cubo de la \figurename~\ref{fig:cubo_marker}.
 
-El cubo se descompone como se puede ver en la \figurename~\ref{fig:cube_layout}. En un primer momento la detección devuelve la posición y rotación de cada cara de forma individual. Dado que se busca la posición del centro del cubo, sobre cada valor obtenido, se aplica una transformación que tiene en cuenta tanto la posición como la orientación actual del marcador. 
-
 \begin{figure}
 	\centering
 	\includegraphics[width=0.4\textwidth]{imaxes/cube_layout.png}
@@ -185,11 +198,13 @@ El cubo se descompone como se puede ver en la \figurename~\ref{fig:cube_layout}.
 	\label{fig:cube_layout}
 \end{figure}
 
-La función \texttt{moveAxis} calcula el desplazamiento necesario para cada eje utilizando la matriz de rotación (obtenida mediante la fórmula de Rodrigues) para asegurar que el desplazamiento se realiza en la dirección correcta respecto a la orientación actual del marcador. Este proceso se aplica para los tres ejes.
+\subsection{Transformación de coordenadas de cara a centro del cubo}
 
-Una vez ajustada la posición del centro, es necesario corregir la orientación de cada cara para mantener un sistema de coordenadas consistente en todo el cubo. La función \texttt{cubeCoordinates} aplica las rotaciones necesarias según la cara detectada, usando la cara 0 como referencia. Las rotaciones se realizan sobre los ejes X, Y, y Z mediante funciones específicas que aplican transformaciones angulares usando radianes (donde $\pi$ radianes equivale a 180 grados).
+El cubo se descompone como se puede ver en la \figurename~\ref{fig:cube_layout}. En un primer momento la detección devuelve la posición y rotación de cada cara de forma individual. Dado que se busca la posición del centro del cubo, sobre cada valor obtenido, se aplica una transformación que tiene en cuenta tanto la posición como la orientación actual del marcador.
 
-Los detalles completos de la implementación de estas funciones, incluyendo el código fuente, se pueden consultar en el Apéndice~\ref{chap:detalles_implementacion}.
+Para el cálculo del desplazamiento necesario para cada eje se utiliza la matriz de rotación (obtenida mediante la fórmula de Rodrigues) para asegurar que el desplazamiento se realiza en la dirección correcta respecto a la orientación actual del marcador. Este proceso se aplica para los tres ejes mediante la función \texttt{moveAxis}, cuya implementación detallada se encuentra en el Apéndice~\ref{chap:detalles_implementacion}.
+
+Una vez ajustada la posición del centro, es necesario corregir la orientación de cada cara para mantener un sistema de coordenadas consistente en todo el cubo. Para ello, la función \texttt{cubeCoordinates} aplica las rotaciones necesarias según la cara detectada, usando la cara 0 como referencia. Los detalles completos del código fuente de estas transformaciones de coordenadas están disponibles en el mismo apéndice.
 
 \subsubsection{Fusión de múltiples detecciones}
 Cuando se detectan múltiples caras del cubo simultáneamente (hasta 3 caras pueden ser visibles en una sola imagen), el sistema debe combinar las estimaciones individuales para obtener una pose más precisa y estable. El algoritmo implementado utiliza un promediado simple de los vectores de traslación y rotación.
@@ -222,9 +237,9 @@ Hasta ahora, se ha descrito el comportamiento de la aplicación para una única 
 
 El diagrama muestra claramente las etapas principales del proceso implementado:
 \begin{enumerate}
-    \item \textbf{Inicialización del sistema}: Apertura de la cámara, carga de parámetros de calibración, creación de las tablas de marcadores para cada cara del cubo e inicialización del detector ARuco.
+    \item \textbf{Inicialización del sistema}: Apertura de la cámara, carga de parámetros de calibración, creación de las tablas de marcadores para cada cara del cubo e inicialización del detector ArUco.
     \item \textbf{Captura de frame}: Obtención del frame de vídeo desde la cámara.
-    \item \textbf{Detección de marcadores}: Identificación inicial de marcadores ARuco en la imagen.
+    \item \textbf{Detección de marcadores}: Identificación inicial de marcadores ArUco en la imagen.
     \item \textbf{Refinamiento de detección}: Mejora de la precisión de detección aplicando el refinamiento específico para cada tabla de marcadores del cubo.
     \item \textbf{Procesamiento por cara}: Para cada una de las seis caras del cubo, se calculan las correspondencias entre puntos de imagen y puntos del objeto 3D.
     \item \textbf{Cálculo de pose individual}: Estimación de pose mediante solvePnP para cada cara que tenga correspondencias válidas.
@@ -237,9 +252,10 @@ El diagrama de flujo completo del algoritmo, desde la captura de imagen hasta la
 
 \section{Implementación del Passthrough en Exposure Render}
 \subsection{Captura de imagen}
+\label{subsec:captura_imagen}
 En un primer momento para la obtención de imágenes sobre las que poder realizar el seguimiento del marcador fiduciario se pretendían usar las propias cámaras frontales del HTC Vive Pro 2. Se trata de un par de cámaras colocadas longitudinalmente a lo largo del frontal del casco, que permiten su uso en aplicaciones de realidad aumentada y realidad mixta.
-Se trató de acceder a las mismas mediante el uso de SRworks C++ SDK y con librerías de terceros a pesar de no tener éxito. Posteriormente tras conversaciones con el equipo de soporte se concluyó que no era posible el acceso a las cámaras de forma nativa. Solo a través de Android o Unity en su defecto, lo que nos hizo descartar esta posibilidad.
-La alternativa era acceder a las imágenes a través de una cámara de terceros. Esta opción presentaba la desventaja de imposibilitar el tratamiento de la imagen directamente en GPU, pero era la única viable.
+Se trató de acceder a las mismas mediante el uso de SRworks C++ SDK y con librerías de terceros a pesar de no tener éxito. Posteriormente tras conversaciones con el equipo de soporte se concluyó que no era posible el acceso a las cámaras de forma nativa. Solo a través de Unreal Engine o Unity en su defecto, lo que nos hizo descartar esta posibilidad. Cabe destacar que durante el desarrollo del proyecto HTC retiró el soporte de la extensión de passthrough en OpenXR, por lo que versiones posteriores del runtime dejaron de anunciar esta funcionalidad a través de la API de extensiones de OpenXR.
+La alternativa era acceder a las imágenes a través de una cámara de terceros. Esta opción presentaba la desventaja de imposibilitar el tratamiento de la imagen directamente en GPU, pero era la única viable dentro del contexto del TFG.
 
 \subsection{Integración del seguimiento}
 Con el fin de no aumentar la cantidad de dependencias de un proyecto de la envergadura de Exposure Render, se trató de implementar la solución de tracking como una librería independiente que se pudiese integrar en el proyecto.
@@ -280,8 +296,8 @@ Para facilitar la integración con Exposure Render, la librería de tracking uti
 La función \texttt{getCubePoseMatrix} implementa una serie de transformaciones para que la pose del cubo detectada por ArUco sea directamente utilizable por el motor de renderizado de Exposure Render. El proceso incluye:
 
 \begin{enumerate}
-    \item \textbf{Transformación del espacio de cámara al espacio del cubo}: Conversión de vectores de rotación y traslación a matriz de transformación 4×4.
-    \item \textbf{Inversión para obtener la matriz modelo}: Conversión de la matriz de vista en matriz modelo.
+    \item \textbf{Construcción de la matriz de transformación}: Conversión de vectores de rotación y traslación de ArUco a matriz de transformación 4×4 que representa la pose del marcador en el sistema de coordenadas de la cámara.
+    \item \textbf{Inversión para obtener la transformación del mundo al marcador}: La matriz de ArUco representa la transformación del marcador a la cámara, por lo que se invierte para obtener la transformación que posiciona objetos virtuales respecto al marcador detectado.
     \item \textbf{Conversión de sistemas de coordenadas}: Compatibilización entre el orden row-major de OpenCV y column-major de OSG.
 \end{enumerate}
 
@@ -290,8 +306,8 @@ Los detalles matemáticos completos de estas transformaciones, incluyendo el có
 
 
 
-\paragraph{Transformación al \gls{worldmatrix}}
-Finalmente, la pose del cubo se transforma desde el espacio de coordenadas de la cámara al \gls{worldmatrix} del entorno VR. Esto se logra multiplicando la pose del cubo por la matriz de transformación inversa del headset VR, que se obtiene del sistema OpenXR:
+\paragraph{Transformación al \gls{worldspace}}
+Finalmente, la pose del cubo se transforma desde el espacio de coordenadas de la cámara al \gls{worldspace} del entorno VR. Esta transformación se realiza mediante la multiplicación de la matriz del cubo por la matriz de transformación del headset VR, que se obtiene del sistema OpenXR:
 
 \begin{lstlisting}[language=C++]
 cv::Mat headsetMat = poseMatrixToCvMat(headsetPose);
@@ -300,19 +316,19 @@ finalTransform = headsetMat * cubeModelTransposed;
 
 La transformación completa se puede expresar matemáticamente como una cadena de operaciones matriciales:
 
-$$\mathbf{M}_{world} = \mathbf{H}^{-1} \cdot (\mathbf{T}_{ArUco}^{-1})^T$$
+$$\mathbf{T}_{world} = \mathbf{H} \cdot (\mathbf{T}_{ArUco}^{-1})^T$$
 
 Donde:
 \begin{itemize}
-    \item $\mathbf{M}_{world}$: Matriz final de transformación del cubo en coordenadas mundiales
-    \item $\mathbf{H}^{-1}$: Matriz inversa de transformación del headset VR (obtenida de OpenXR)
-    \item $\mathbf{T}_{ArUco}$: Matriz de transformación del cubo detectada por ArUco
-    \item $(\mathbf{T}_{ArUco}^{-1})^T$: Matriz transpuesta de la inversa de $\mathbf{T}_{ArUco}$
+    \item $\mathbf{T}_{world}$: Matriz de transformación final del cubo en el \gls{worldspace}
+    \item $\mathbf{H}$: Matriz de transformación del headset VR en el \gls{worldspace} (obtenida de OpenXR)
+    \item $\mathbf{T}_{ArUco}$: Matriz de transformación vista del cubo detectada por ArUco (de cubo a cámara)
+    \item $(\mathbf{T}_{ArUco}^{-1})^T$: Matriz transpuesta de la inversa de $\mathbf{T}_{ArUco}$ (modelo del cubo en espacio de cámara)
 \end{itemize}
 
-Esta fórmula unifica todos los pasos de transformación en una sola expresión matemática que convierte la \gls{pose} detectada por ArUco en una \gls{worldmatrix} compatible con Exposure Render.
+Esta cadena de transformaciones convierte la pose detectada por ArUco desde el espacio de coordenadas de la cámara al \gls{worldspace} compatible con Exposure Render.
 
-Este enfoque permite que el objeto virtual renderizado por Exposure Render se mantenga perfectamente alineado con el marcador físico en el mundo real, independientemente de los movimientos del usuario y la cámara. La cadena completa de transformaciones asegura que las convenciones de coordenadas de ArUco, OpenCV, \acrshort{osg} y OpenXR sean compatibles entre sí, proporcionando una experiencia de realidad aumentada coherente y precisa.
+Este enfoque permite que el objeto virtual renderizado por Exposure Render se mantenga perfectamente alineado con el marcador físico en el mundo real, independientemente de los movimientos del usuario y la cámara. La secuencia completa de transformaciones asegura que las convenciones de coordenadas de ArUco, OpenCV, \acrshort{osg} y OpenXR sean compatibles entre sí, proporcionando una experiencia de realidad aumentada coherente y precisa.
 
 \subsection{Consideraciones de implementación alternativa}
 
@@ -323,7 +339,7 @@ Como resultado de estas consideraciones técnicas, se desarrolló una implementa
 \section{Aplicación Independiente de Realidad Aumentada}
 \label{sec:aplicacion_independiente}
 
-Con el fin de demostrar la viabilidad del sistema de \gls{tracking} desarrollado y proporcionar una herramienta práctica para la visualización de modelos anatómicos sobre marcadores fiduciarios, se implementó una aplicación independiente de realidad aumentada. Esta aplicación combina las capacidades de seguimiento ARuco desarrolladas anteriormente con un sistema de renderizado 3D que permite cargar y visualizar modelos anatómicos de diversas fuentes.
+Con el fin de demostrar la viabilidad del sistema de \gls{tracking} desarrollado y proporcionar una herramienta práctica para la visualización de modelos anatómicos sobre marcadores fiduciarios, se implementó una aplicación independiente de realidad aumentada. Esta aplicación combina las capacidades de seguimiento ArUco desarrolladas anteriormente con un sistema de renderizado 3D que permite cargar y visualizar modelos anatómicos de diversas fuentes.
 
 \subsection{Arquitectura de la aplicación}
 
@@ -345,7 +361,7 @@ El sistema de renderizado implementado utiliza OpenGL con shaders programables p
 El renderizador OpenGL proporciona las siguientes características:
 
 \begin{itemize}
-    \item \textbf{Iluminación realista}: Implementa un \gls{phong} con componentes ambiente, difusa y especular.
+    \item \textbf{Modelo de iluminación}: Implementa un \gls{phong} con componentes ambiente, difusa y especular.
     \item \textbf{Soporte para texturas}: Permite aplicar texturas a los modelos cuando están disponibles en el archivo del modelo.
     \item \textbf{Renderizado fuera de pantalla}: Utiliza framebuffers para renderizar la escena en una textura que posteriormente se compone con la imagen de la cámara.
     \item \textbf{Compatibilidad con múltiples formatos}: Mediante \acrshort{assimp}, soporta formatos como FBX, OBJ, 3DS, COLLADA, etc.
@@ -357,7 +373,7 @@ El pipeline de renderizado se basa en dos tipos de shaders principales que opera
 El vertex shader se encarga de procesar cada vértice individual del modelo 3D. Su función principal es transformar las coordenadas de los vértices desde el espacio del modelo al espacio de pantalla mediante la aplicación de las matrices de transformación (modelo, vista y proyección). Además, prepara la información necesaria para el fragment shader, incluyendo las posiciones transformadas en el espacio mundial, las normales corregidas para la iluminación y las coordenadas de textura.
 
 \subsubsection{Fragment Shader}
-El fragment shader opera sobre cada píxel de las superficies renderizadas e implementa el \gls{phong} para calcular la iluminación final. Este shader combina tres componentes de iluminación: la luz ambiente (que proporciona una iluminación base uniforme), la luz difusa (que simula la reflexión lamberiana dependiente del ángulo de incidencia) y la luz especular (que genera los brillos característicos de las superficies). El resultado final se combina con las texturas del modelo cuando están disponibles, proporcionando un renderizado visualmente realista.
+El fragment shader opera sobre cada píxel de las superficies renderizadas e implementa el \gls{phong} para calcular la iluminación final. Este shader combina tres componentes de iluminación: la luz ambiente (que proporciona una iluminación base uniforme), la luz difusa (que simula la \gls{lambert} dependiente del ángulo de incidencia) y la luz especular (que genera los brillos característicos de las superficies). El resultado final se combina con las texturas del modelo cuando están disponibles, proporcionando una apariencia adecuada.
 
 \subsection{Sistema de carga de modelos}
 
