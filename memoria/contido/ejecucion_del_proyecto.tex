@@ -97,7 +97,7 @@ Si bien existen aproximaciones que buscan puntos claves de las figuras o reconoc
 Para la implementación del sistema de seguimiento en este proyecto, se utilizó la librería ArUco aprovechando los fundamentos teóricos de visión por computador descritos en la Sección~\ref{chap:ft}. La integración con Exposure Render requirió adaptaciones específicas para compatibilizar los sistemas de coordenadas y garantizar un seguimiento robusto en tiempo real.
 
 \paragraph{Selección del diccionario de marcadores.}
-En la implementación actual se emplea el diccionario \texttt{DICT\_6X6\_250}, que contiene 250 marcadores únicos de 6×6 bits cada uno. Este diccionario fue seleccionado por ofrecer un buen equilibrio entre:
+En la implementación actual se emplea el diccionario \srccode{DICT\_6X6\_250}, que contiene 250 marcadores únicos de 6×6 bits cada uno. Este diccionario fue seleccionado por ofrecer un buen equilibrio entre:
 
 \begin{itemize}
 	\item \textbf{Detectabilidad}: Los marcadores de 6×6 bits proporcionan suficiente información para una detección robusta incluso en condiciones de iluminación variable.
@@ -125,7 +125,7 @@ Para mejorar la robustez del seguimiento, se implementó un sistema basado en ta
 \end{figure}
 
 \paragraph{Integración con Exposure Render.}
-La principal adaptación requerida para la integración con Exposure Render consistió en la transformación de coordenadas entre los sistemas de referencia de ArUco y el motor de renderizado. Esta transformación se implementa en la función \texttt{getCubePoseMatrix}, que convierte los vectores de rotación y traslación proporcionados por ArUco en matrices de transformación 4×4 compatibles con el sistema de renderizado.
+La principal adaptación requerida para la integración con Exposure Render consistió en la transformación de coordenadas entre los sistemas de referencia de ArUco y el motor de renderizado. Esta transformación se implementa en la función \srccode{getCubePoseMatrix}, que convierte los vectores de rotación y traslación proporcionados por ArUco en matrices de transformación 4×4 compatibles con el sistema de renderizado.
 
 El proceso de integración incluye:
 \begin{enumerate}
@@ -135,7 +135,7 @@ El proceso de integración incluye:
 \end{enumerate}
 
 \subsection{Generación de marcadores a partir de diccionarios predefinidos}
-El marcador fiduciario utilizado en este proyecto se genera a partir de un diccionario predefinido de ArUco. En la implementación actual se emplea el diccionario \texttt{DICT\_6X6\_250}, que contiene 250 marcadores únicos de 6×6 bits cada uno. Este diccionario fue seleccionado por ofrecer un buen equilibrio entre:
+El marcador fiduciario utilizado en este proyecto se genera a partir de un diccionario predefinido de ArUco. En la implementación actual se emplea el diccionario \srccode{DICT\_6X6\_250}, que contiene 250 marcadores únicos de 6×6 bits cada uno. Este diccionario fue seleccionado por ofrecer un buen equilibrio entre:
 
 \begin{itemize}
     \item \textbf{Robustez en la detección}: Los marcadores de 6×6 bits proporcionan suficiente información para una detección fiable incluso con cierta degradación de la imagen.
@@ -146,11 +146,11 @@ El marcador fiduciario utilizado en este proyecto se genera a partir de un dicci
 La generación del cubo marcador sigue un esquema sistemático donde cada cara del cubo contiene una matriz 2×2 de marcadores del mismo diccionario. Los identificadores (IDs) de los marcadores se asignan secuencialmente siguiendo la fórmula:
 
 \begin{center}
-\texttt{firstId = cara\_id * 4}\\
-\texttt{ids = \{firstId, firstId + 1, firstId + 2, firstId + 3\}}
+\srccode{firstId = cara\_id * 4}\\
+\srccode{ids = \{firstId, firstId + 1, firstId + 2, firstId + 3\}}
 \end{center}
 
-Donde \texttt{cara\_id} corresponde al número de cara del cubo (0-5). De esta forma:
+Donde \srccode{cara\_id} corresponde al número de cara del cubo (0-5). De esta forma:
 \begin{itemize}
 	\item Cara 0: marcadores con IDs 0, 1, 2, 3
 	\item Cara 1: marcadores con IDs 4, 5, 6, 7
@@ -196,9 +196,9 @@ Finalmente, fruto de los tests, se llegó al cubo de la \figurename~\ref{fig:cub
 
 El cubo se descompone como se puede ver en la \figurename~\ref{fig:cube_layout}. En un primer momento la detección devuelve la posición y rotación de cada cara de forma individual. Dado que se busca la posición del centro del cubo, sobre cada valor obtenido, se aplica una transformación que tiene en cuenta tanto la posición como la orientación actual del marcador.
 
-Para el cálculo del desplazamiento necesario para cada eje se utiliza la matriz de rotación (obtenida mediante la fórmula de Rodrigues) para asegurar que el desplazamiento se realiza en la dirección correcta respecto a la orientación actual del marcador. Este proceso se aplica para los tres ejes mediante la función \texttt{moveAxis}, cuya implementación detallada se encuentra en el Apéndice~\ref{chap:detalles_implementacion}.
+Para el cálculo del desplazamiento necesario para cada eje se utiliza la matriz de rotación (obtenida mediante la fórmula de Rodrigues) para asegurar que el desplazamiento se realiza en la dirección correcta respecto a la orientación actual del marcador. Este proceso se aplica para los tres ejes mediante la función \srccode{moveAxis}, cuya implementación detallada se encuentra en el Apéndice~\ref{chap:detalles_implementacion}.
 
-Una vez ajustada la posición del centro, es necesario corregir la orientación de cada cara para mantener un sistema de coordenadas consistente en todo el cubo. Para ello, la función \texttt{cubeCoordinates} aplica las rotaciones necesarias según la cara detectada, usando la cara 0 como referencia. Los detalles completos del código fuente de estas transformaciones de coordenadas están disponibles en el mismo apéndice.
+Una vez ajustada la posición del centro, es necesario corregir la orientación de cada cara para mantener un sistema de coordenadas consistente en todo el cubo. Para ello, la función \srccode{cubeCoordinates} aplica las rotaciones necesarias según la cara detectada, usando la cara 0 como referencia. Los detalles completos del código fuente de estas transformaciones de coordenadas están disponibles en el mismo apéndice.
 
 \subsubsection{Fusión de múltiples detecciones}
 Cuando se detectan múltiples caras del cubo simultáneamente (hasta 3 caras pueden ser visibles en una sola imagen), el sistema debe combinar las estimaciones individuales para obtener una pose más precisa y estable. El algoritmo implementado utiliza un promediado simple de los vectores de traslación y rotación.
@@ -261,30 +261,31 @@ La alternativa era acceder a las imágenes a través de una cámara de terceros.
 \subsection{Integración del seguimiento}
 Con el fin de no aumentar la cantidad de dependencias de un proyecto de la envergadura de Exposure Render, se trató de implementar la solución de tracking como una librería independiente que se pudiese integrar en el proyecto.
 
-La integración del sistema de tracking ArUco en Exposure Render se realizó como una librería independiente que proporciona la funcionalidad de seguimiento de marcadores fiduciarios. El punto central de esta integración es la función \texttt{getCubePoseMatrix}, que actúa como interfaz principal entre el sistema de tracking y la aplicación de realidad aumentada.
+La integración del sistema de tracking ArUco en Exposure Render se realizó como una librería independiente que proporciona la funcionalidad de seguimiento de marcadores fiduciarios. El punto central de esta integración es la función \srccode{getCubePoseMatrix}, que actúa como interfaz principal entre el sistema de tracking y la aplicación de realidad aumentada.
 
 \subsubsection{Función getCubePoseMatrix}
-La función \texttt{getCubePoseMatrix} es la interfaz principal que proporciona la pose del cubo marcador en el espacio tridimensional. Los parámetros de esta función incluyen configuraciones para visualización, dimensiones físicas del marcador, rutas de calibración y directorios de configuración.
+La función \srccode{getCubePoseMatrix} es la interfaz principal que proporciona la pose del cubo marcador en el espacio tridimensional. Los parámetros de esta función incluyen configuraciones para visualización, dimensiones físicas del marcador, rutas de calibración y directorios de configuración.
 
 Los detalles completos de la signatura de esta función y sus parámetros se pueden consultar en el Apéndice~\ref{chap:detalles_implementacion}.
 
 \subsubsection{Implementación como hilo independiente}
-Para minimizar la latencia y mantener la fluidez del renderizado principal, el sistema de tracking se implementó como un hilo independiente mediante la clase \texttt{Tracking} que encapsula toda la funcionalidad de seguimiento.
+Para minimizar la latencia y mantener la fluidez del renderizado principal, el sistema de tracking se implementó como un hilo independiente mediante la clase \srccode{Tracking} que encapsula toda la funcionalidad de seguimiento.
 
-El flujo de ejecución del tracking opera en un hilo separado (\texttt{poseThread}) que ejecuta continuamente el siguiente proceso:
+El flujo de ejecución del tracking opera en un hilo separado (\srccode{poseThread}) que ejecuta continuamente el siguiente proceso:
 
 \begin{enumerate}
     \item \textbf{Captura de pose del headset}: Obtiene la matriz de transformación actual del casco VR desde el sistema OpenXR.
     \item \textbf{Captura de imagen}: Adquiere una nueva imagen desde la cámara del sistema.
-    \item \textbf{Procesamiento de marcadores}: Ejecuta la detección y seguimiento de marcadores ArUco llamando a \texttt{getCubePoseMatrix}.
-    \item \textbf{Sincronización de datos}: Actualiza de forma thread-safe la pose más reciente del cubo y la imagen procesada.
+    \item \textbf{Procesamiento de marcadores}: Ejecuta la detección y seguimiento de marcadores ArUco llamando a \srccode{getCubePoseMatrix}.
+    \item \textbf{Sincronización de datos}: Actualiza de forma \emph{thread-safe} la pose más reciente del cubo y la imagen procesada.
     \item \textbf{Actualización del overlay}: Envía la imagen procesada al sistema de overlay para visualización en realidad aumentada.
 \end{enumerate}
 
 La gestión de concurrencia utiliza mecanismos de sincronización para garantizar la integridad de los datos compartidos:
 \begin{itemize}
-    \item \textbf{std::mutex}: Protege el acceso a las variables \texttt{\_latestPose} y \texttt{\_latestCameraImage}.
-    \item \textbf{std::atomic<bool>}: Controla el estado de ejecución del hilo mediante \texttt{\_poseThreadRunning}.
+    \item \textbf{std::mutex}: Se utiliza para la protección del acceso a
+      las variables \srccode{\_latestPose} y \srccode{\_latestCameraImage}.
+    \item \textbf{std::atomic<bool>}: Se usa para controlar el estado de ejecución del hilo mediante \srccode{\_poseThreadRunning}.
     \item \textbf{Lock guards}: Garantizan el acceso exclusivo durante las operaciones de lectura y escritura de datos compartidos.
 \end{itemize}
 
@@ -292,9 +293,9 @@ Esta arquitectura asegura que el hilo principal de renderizado no se vea bloquea
 
 \subsubsection{Estructura de datos PoseMatrix4x4 y transformaciones de coordenadas}
 
-Para facilitar la integración con Exposure Render, la librería de tracking utiliza la estructura \texttt{PoseMatrix4x4}, que representa una matriz de 4×4. Esta estructura encapsula tanto la rotación como la traslación del marcador en el espacio 3D.
+Para facilitar la integración con Exposure Render, la librería de tracking utiliza la estructura \srccode{PoseMatrix4x4}, que representa una matriz de 4×4. Esta estructura encapsula tanto la rotación como la traslación del marcador en el espacio 3D.
 
-La función \texttt{getCubePoseMatrix} implementa una serie de transformaciones para que la pose del cubo detectada por ArUco sea directamente utilizable por el motor de renderizado de Exposure Render. El proceso incluye:
+La función \srccode{getCubePoseMatrix} implementa una serie de transformaciones para que la pose del cubo detectada por ArUco sea directamente utilizable por el motor de renderizado de Exposure Render. El proceso incluye:
 
 \begin{enumerate}
     \item \textbf{Construcción de la matriz de transformación}: Conversión de vectores de rotación y traslación de ArUco a matriz de transformación 4×4 que representa la pose del marcador en el sistema de coordenadas de la cámara.
@@ -410,7 +411,7 @@ El flujo principal de la aplicación coordina todos los componentes del sistema:
 
 \begin{enumerate}
     \item \textbf{Inicialización de rutas}: Se establecen las rutas a los archivos de calibración, marcadores y modelos 3D.
-    \item \textbf{Creación del hilo de captura}: Se inicia un hilo independiente para el \gls{tracking} de marcadores mediante \texttt{captureThreadFunc}.
+    \item \textbf{Creación del hilo de captura}: Se inicia un hilo independiente para el \gls{tracking} de marcadores mediante \srccode{captureThreadFunc}.
     \item \textbf{Inicialización del renderizador}: Se crea e inicializa el sistema de renderizado (OpenGL o OpenCV según la configuración).
     \item \textbf{Bucle principal de renderizado}: Se ejecuta el bucle principal que combina las imágenes de la cámara con los modelos 3D renderizados.
 \end{enumerate}
