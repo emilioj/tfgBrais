@@ -2,41 +2,41 @@
 \label{chap:hs}
 En este capítulo se explican las herramientas y librerías utilizadas para llevar a cabo el proyecto.
 \section{Lenguajes de programación}
-    \subsection{C++}    
-El proyecto se desarrolló en su totalidad en C++. Esto se debe a que, como se menciona previamente, este trabajo forma parte del esfuerzo académico de \citeauthor{IglesiasGuitian2022} y por coherencia se decidió seguir la línea de trabajo.
-C++ es un lenguaje de programación que se beneficia de programación orientada a objetos sobre la sintaxis de C y se ha utilizado para implementar librerías gráficas intrínsecas en el proyecto.
+    \paragraph{C++}~\\
+    El proyecto se desarrolló en su totalidad en C++. Esto se debe a que, como se menciona previamente, este trabajo forma parte del esfuerzo académico de \citeauthor{IglesiasGuitian2022} y por coherencia se decidió seguir la línea de trabajo.
+C++ es un lenguaje de programación que se beneficia de programación orientada a objetos sobre la sintaxis de C y se ha utilizado para implementar librerías gráficas intrínsecas en el proyecto. C++ es el lenguaje de programación predominante en aplicaciones interactivas de alto rendimiento.
 
 \section{Sistema Operativo}
-\subsection{Windows 11}
+\paragraph{Windows 11}~\\
 Windows 11 es un sistema operativo desarrollado por Microsoft. Se utilizó debido a la familiaridad del proyecto con el mismo.
 \section{Control de versiones}
-    \subsection{GitLab}
-Para llevar a cabo el control de versiones se utilizó GitLab ya que el código implementado formaba parte del proyecto previamente mencionado, y este se almacena en GitLab.
+    \paragraph{Git y GitLab}~\\
+Para llevar a cabo el control de versiones se utilizó Git, manteniendo un repositorio remoto en el servicio web GitLab.
 \section{Entorno de desarrollo}
-    \subsection{Visual Studio Community}
-Es el Entorno de desarrollo de C++ por excelencia en Windows.
+    \paragraph{Visual Studio Community}~\\
+Para la programación se optó por este IDE de Microsoft, que ofrece muchas facilidades para un desarrollo eficiente en C++ en Windows.
 \section{Herramientas}
-    \subsection{DICOM}
+    \paragraph{DICOM}~\\
     \acrshort{dicom} es la denominación de un estándar utilizado principalmente para la visualización, impresión, almacenamiento y transmisión de imágenes y datos de propósito médico.
     Los ficheros \acrshort{dicom} consisten en una cabecera con campos estandarizados y de forma libre, y un cuerpo con datos de imagen. Un objeto \acrshort{dicom} simple puede contener solamente una imagen, pero esta imagen puede tener múltiples fotogramas, permitiendo el almacenamiento de bloques de datos con varios fotogramas.
    
-    \subsection{3D Slicer}
+    \paragraph{3D Slicer}~\\
 3D Slicer es un programa de software libre diseñado para solventar los problemas más avanzados de la computación de imagen relacionados con las aplicaciones clínicas y biométricas. Entre las capacidades del mismo se encuentra la posibilidad de implementar scripts de Python, segmentación de imágenes y volúmenes, la posibilidad de añadir extensiones para aumentar su funcionalidad y la interoperabilidad del estándar \acrshort{dicom}, entre otras.
 
-\subsection{Meshmixer}
+\paragraph{Meshmixer}~\\
 Al procurar generar un modelo a partir de una nube de puntos de un TAC, es común encontrarse con que los modelos exportados en STL contienen errores y no pueden ser impresos directamente. Se probaron varias herramientas para solventar estos errores en la estructura de los modelos 3D, pero finalmente \href{https://www.meshmixer.com}{Meshmixer} resultó dar los mejores resultados a la hora de arreglar las geometrías con esta casuística tan específica.
-    \subsection{Meshlab}
+    \paragraph{Meshlab}~\\
 Una alternativa de software libre para la reparación de mallas 3D es \href{https://www.meshlab.net}{Meshlab}, que ofrece herramientas similares para limpiar y corregir geometrías de modelos STL.
-    \subsection{Blender}
+    \paragraph{Blender}~\\
 Blender es un potente software de modelado, animación, renderizado y edición 3D de código abierto y gratuito. Ofrece una suite completa de herramientas para la creación y manipulación de modelos 3D, incluyendo texturizado, iluminación, simulación física y composición. En este proyecto, se utilizó para procesar y refinar modelos 3D generados a partir de imágenes médicas, aprovechando su flexibilidad para trabajar con formatos como STL y OBJ, y su capacidad para integrar scripts en Python para automatizar tareas.
-    \subsection{UltiMaker Cura}
+    \paragraph{UltiMaker Cura}~\\
 UltiMaker Cura es el programa desarrollado por UltiMaker para generar el GCODE necesario para imprimir modelos en una impresora de dicha marca. Se utilizó ya que permite importar ajustes específicos de la impresora sobre la que se trabajó de forma sencilla.
-\section{Frameworks}
+\section{APIs, frameworks y bibliotecas software}
 \subsection{OpenXR}
 OpenXR es una \acrfull{api} multiplataforma que permite el desarrollo de medios en el \textit{virtual continuum} mediante ordenadores a través de interacción humano-máquina.
 Esta \acrshort{api} es la interfaz con un runtime para llevar a cabo operaciones comunes como puede ser acceder al estado de un mando o periférico, obtener o predecir la posición del sistema o enviar frames para ser renderizados.
 
-\subsubsection{Ciclo de Vida}
+\subsubsection{Ciclo de Vida de un proyecto OpenXR}
 En la \figurename~\ref{fig:openxrlifecycle} se muestra la máquina de estados de la sesión:
 \begin{enumerate}
     \item La aplicación crea una sesión escogiendo un sistema y una API gráfica. En un primer momento esta se encuentra en estado IDLE.
@@ -77,7 +77,7 @@ Esta arquitectura permite el desarrollo multiplataforma con mayor simplicidad, p
 En este proyecto, \acrshort{osg} se utiliza para renderizar la interfaz de usuario en modo VR, proporcionando las herramientas necesarias para interactuar con la visualización en el entorno de realidad virtual.
 
 \subsection{Assimp}
-\acrfull{assimp} es una librería portátil de código abierto diseñada para importar múltiples formatos de modelos 3D. La librería soporta decenas de formatos de archivo diferentes incluyendo FBX, OBJ, 3DS, DAE, entre otros. En este proyecto se utiliza para cargar modelos 3D anatómicos generados a partir de imágenes de \acrshort{tc}, proporcionando una interfaz consistente para acceder a geometrías, texturas y materiales independientemente del formato de archivo original.
+\acrfull{assimp} es una librería multiplataforma de código abierto diseñada para importar múltiples formatos de modelos 3D. La librería soporta decenas de formatos de archivo diferentes incluyendo FBX, OBJ, 3DS, DAE, entre otros. En este proyecto se utiliza para cargar modelos 3D anatómicos generados a partir de imágenes de \acrshort{tc}, proporcionando una interfaz consistente para acceder a geometrías, texturas y materiales independientemente del formato de archivo original.
 
 \subsection{GLFW}
 \acrfull{glfw} es una librería multiplataforma de código abierto para desarrollo de aplicaciones OpenGL, OpenGL ES y Vulkan. Proporciona una \acrshort{api} simple para crear ventanas, contextos y superficies, recibir entradas y eventos. En este proyecto se utiliza para la gestión de ventanas de renderizado y la creación de contextos OpenGL necesarios para la visualización de modelos 3D en tiempo real.
@@ -111,15 +111,15 @@ Los últimos años, los desarrollos de nuevos marcadores han tendido a un cuadra
   \label{fig:qrtags}
 \end{figure}
 
-\subsection{Funcionamiento de ArUco}
+%\subsection{Funcionamiento de ArUco}
 
-\subsubsection*{Captura de imágenes o videos}
+\paragraph{Captura de imágenes o videos con ArUco}~\\
 La captura de imágenes o vídeos se realiza mediante un dispositivo específico, como una cámara digital o un dispositivo móvil con cámara incorporada. En este paso se espera obtener una serie de imágenes o un vídeo sobre el que se espera encontrar uno o varios marcadores ArUco.
-\subsubsection*{Conversión a escala de grises}
+\paragraph{Conversión a escala de grises}~\\
 La conversión a escala de grises se realiza mediante el algoritmo de promedio ponderado de los canales RGB. Esta conversión reduce la cantidad de información a procesar y mejora la velocidad de procesamiento al trabajar con un único canal de información.
-\subsubsection*{Aplicación de un filtro de bordes}
+\paragraph{Aplicación de un filtro de bordes}~\\
 Para resaltar los bordes de los marcadores en la imagen se aplica un filtro de bordes. Un ejemplo común es el algoritmo de Canny, que se basa en la detección de gradientes y utiliza un umbral para determinar que bordes son relevantes y cuales no.
-\subsubsection*{Detección de contornos}
+\paragraph{Detección de contornos}~\\
 Se utiliza un algoritmo de detección de contornos adaptativo para encontrar los contornos de los marcadores en la imagen. Un algoritmo común es el Transformada de Hough que permite detectar contornos circulares y lineales en la imagen. Este algoritmo busca patrones en la imagen que se correspondan con los contornos de los marcadores ArUco.
 En un sistema de thresholding tradicional, se elige un umbral global para toda la imagen. Cualquier píxel con un valor de brillo superior al umbral se considera activo (p.ej. negro) y cualquier píxel con un valor de brillo inferior al umbral se considera inactivo (p.ej. blanco). Sin embargo, en muchas imágenes, el nivel óptimo de umbral puede variar entre diferentes partes de la imagen. El thresholding adaptativo se utiliza para solucionar este problema.
 
@@ -156,7 +156,7 @@ Además es posible modificar los siguientes parámetros para adecuar la librerí
     La relación entre la distancia entre los marcadores y su longitud de lado. Esto se utiliza para ignorar marcadores que estén demasiado cerca entre sí.
 \end{itemize}
 
-\subsubsection*{Extracción de Bits}
+\paragraph{Extracción de Bits}~\\
 Los bits extraídos de cada candidato se analizan para determinar si corresponden a marcadores válidos.
 Para ello se somete cada sección de la imagen a una corrección de perspectiva. A continuación se subdivide el candidato en la cantidad previamente establecida en el diccionario de bits que componen cada marcador. La imagen corregida se binariza utilizando el \gls{otsu} para separar píxeles blancos y negros. Posteriormente, la imagen se divide en una cuadrícula con el mismo número de celdas que bits tiene el marcador. En cada celda se cuenta el número de píxeles blancos y negros para determinar el valor del bit asignado a dicha celda (mediante el valor mayoritario), como en el ejemplo de la \figurename~\ref{fig:mbe}.
 
@@ -166,11 +166,11 @@ Para ello se somete cada sección de la imagen a una corrección de perspectiva.
   \caption{Proceso de extracción de Bits}\label{fig:mbe}
 \end{figure}
 
-\subsubsection*{Identificación de Marcadores}
+\paragraph{Identificación de Marcadores}~\\
 Se verifica si el código extraído pertenece al diccionario y, en caso necesario, se aplican algoritmos de corrección de errores.
 La primera operación consiste en determinar la cantidad de bits erróneos permitidos en el borde de un marcador, ya que todos los marcadores ArUco cuentan al menos con un bit de borde. En lo que a corrección de errores se refiere, cada diccionario cuenta con un límite teórico de bits que pueden ser corregidos.
 
-\subsubsection*{Refinado de Esquinas}
+\paragraph{Refinado de Esquinas}~\\
 Se puede realizar un refinado a nivel de subpíxel de las esquinas para mejorar la precisión del sistema. Este último paso implica una alta carga computacional, pero se recomienda en aplicaciones en las que prima la precisión como es el caso.
 
 Esta librería trabaja con un \gls{pinhole} lo que quiere decir que se considera como el origen de coordenadas el punto en el que todos los rayos de luz convergerían en una supuesta cámara estenopeica ideal.
@@ -188,10 +188,14 @@ Las coordenadas se definen de la siguiente forma: Z crece frente a la cámara mi
 Se utilizaron dos impresoras 3D a lo largo del proyecto puesto que eran necesarios distintos requisitos para cada pieza.
 Los modelos anatómicos debido a su complejidad se imprimieron en una impresora Fuse 1+ 30W que utiliza polvo de nylon para llevar a cabo las piezas.
 Para los marcadores fiduciarios, se utilizó la Ultimaker 3, ya que se trata de figuras más simples en las que la posibilidad de imprimir en distintos colores era especialmente importante.
-\subsection{Obtención de vídeo}
-Inicialmente se intentaron utilizar las cámaras frontales integradas del \acrshort{hmd} HTC Vive Pro 2 para esta función, pero debido a limitaciones técnicas en el acceso nativo a las cámaras (como se detalla en la Sección~\ref{subsec:captura_imagen}), se optó por utilizar una cámara externa.
 
-\subsubsection{Logitech Brio 500}
+\subsection{Equipamiento de \gls{vr}}
+Se trabajó, principalmente, con el \acrshort{hmd} HTC Vive Pro 2.
+
+\subsection{Obtención de vídeo}
+Inicialmente se intentaron utilizar las cámaras frontales integradas del HTC Vive Pro 2 para esta función, pero debido a limitaciones técnicas en el acceso nativo a las cámaras (como se detalla en la Sección~\ref{subsec:captura_imagen}), se optó por utilizar una cámara externa.
+
+\paragraph{Logitech Brio 500}~\\
 La Logitech Brio 500 es una cámara web de alta calidad que ofrece grabación en HD a 60 fps. Esta cámara fue utilizada para la captura de imágenes y video en el desarrollo del sistema de realidad aumentada, proporcionando la entrada visual necesaria para el seguimiento de marcadores ArUco y la calibración del sistema. 
 
 
