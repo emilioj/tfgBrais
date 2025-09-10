@@ -3,13 +3,7 @@
 Este capítulo tiene como objetivo tratar el desarrollo del proyecto en sí mismo, así como discutir las opciones disponibles durante el progreso y las decisiones tomadas para llevarlo a cabo.
 
 \section{Consideraciones previas}
-Este traLa función \texttt{getCubePoseMatrix} implementa una serie de transformaciones para que la pose del cubo detectada por ArUco sea directamente utilizable por el motor de renderizado de Exposure Render. El proceso incluye:
-
-\begin{enumerate}
-    \item \textbf{Construcción de la matriz de transformación}: Conversión de vectores de rotación y traslación de ArUco a matriz de transformación 4×4 que representa la pose del marcador respecto a la cámara.
-    \item \textbf{Inversión para obtener la matriz modelo}: La matriz construida representa la transformación del cubo hacia la cámara (view matrix). Se invierte para obtener la matriz modelo del cubo en el espacio de coordenadas de la cámara, necesaria para el posicionamiento de objetos virtuales.
-    \item \textbf{Conversión de sistemas de coordenadas}: Compatibilización entre el orden row-major de OpenCV y column-major de OSG mediante transposición matricial.
-\end{enumerate}ce como un desarrollo del proyecto troncal de \citeauthor{IglesiasGuitian2022} y como tal se debe ceñir a las condiciones que acarrea dicho proyecto. Todo el equipo utilizado durante el desarrollo fue provisto por parte del mismo, o en su defecto por parte del \acrfull{citic}.
+Este trabajo nace como un desarrollo del proyecto de \citeauthor{IglesiasGuitian2022} y como tal se debe ceñir a las condiciones que acarrea dicho proyecto. Todo el equipo utilizado durante el desarrollo fue provisto por parte del mismo, o en su defecto por parte del \acrfull{citic}.
 
 \section{Análisis}
 Se llevó a cabo un estudio para definir la hoja de ruta del proyecto. Dada la problemática a solventar, este trabajo alcanza a tocar áreas bien diferenciadas entre si que se pueden destacar como los pasos a seguir del mismo:
@@ -248,7 +242,14 @@ El diagrama muestra claramente las etapas principales del proceso implementado:
     \item \textbf{Comunicación de resultados}: Retorno de la pose final calculada o pose vacía si no se detectaron marcadores.
 \end{enumerate}
 
-El diagrama de flujo completo del algoritmo, desde la captura de imagen hasta la obtención de la pose final del cubo, se puede consultar en el Apéndice~\ref{chap:diagramas_detallados}.
+El diagrama de flujo completo del algoritmo se muestra a continuación en la \figurename~\ref{fig:flujo_tfg_detallado}, donde se pueden observar todas las etapas del proceso, desde la captura de imagen hasta la obtención de la pose final del cubo.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=1.0\textwidth]{imaxes/flujo_tfg_correcto.png}
+	\caption{Diagrama de flujo detallado del sistema de tracking implementado. El diagrama muestra el proceso completo desde la inicialización del sistema hasta la comunicación de resultados, incluyendo la captura de frames, detección de marcadores, cálculo de poses individuales y fusión de múltiples detecciones.}
+	\label{fig:flujo_tfg_detallado}
+\end{figure}
 
 \section{Implementación del Passthrough en Exposure Render}
 \subsection{Captura de imagen}
